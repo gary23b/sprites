@@ -1,6 +1,6 @@
 package models
 
-type Keys struct {
+type KeysStruct struct {
 	LeftArrow  bool
 	RightArrow bool
 	UpArrow    bool
@@ -83,21 +83,21 @@ type Keys struct {
 	CloseSquareBracket bool
 }
 
-type MouseButtons struct {
+type MouseStruct struct {
 	Left   bool
 	Right  bool
 	Center bool
 	// Back    bool
 	// Forward bool
-}
 
-type UserInput struct {
-	KeysDown Keys
-	// KeysJustPressed Keys // Doesn't work like desired because we aren't getting the user input each time the game loop runs...
-
-	MouseDown MouseButtons
-	// MouseJustPressed MouseButtons
 	MouseX      int
 	MouseY      int
 	MouseScroll float64
+}
+
+type UserInput struct {
+	AnyPressed bool
+
+	Keys  KeysStruct
+	Mouse MouseStruct
 }

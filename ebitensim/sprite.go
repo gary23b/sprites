@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/tools"
 )
 
 func LoadSpriteFile(path string) (image.Image, error) {
@@ -24,7 +25,7 @@ func LoadSpriteFile(path string) (image.Image, error) {
 }
 
 type sprite struct {
-	sim *simStruct
+	sim models.Sim
 
 	spriteID     int
 	constumeName string
@@ -39,13 +40,14 @@ type sprite struct {
 	deleted bool
 
 	costumeMap map[string]int
+
+	clickBody     *tools.ClickOnBody
+	userInputChan chan *models.UserInput
 }
 
 var _ models.Sprite = &sprite{}
 
-func newSprite(sim *simStruct) *sprite {
-	spriteID := sim.g.GetNextSpriteID()
-
+func newSprite(sim models.Sim, spriteID int) *sprite {
 	ret := &sprite{
 		spriteID:   spriteID,
 		opacity:    100,
@@ -53,14 +55,13 @@ func newSprite(sim *simStruct) *sprite {
 		scaleY:     1,
 		sim:        sim,
 		costumeMap: make(map[string]int),
+		clickBody:  tools.NewTouchCollisionBody(),
 	}
-
-	update := spriteAddNewSprite{
-		SpriteID: ret.spriteID,
-	}
-	sim.cmdChan <- update
-
 	return ret
+}
+
+func (s *sprite) GetSpriteID() int {
+	return s.spriteID
 }
 
 // Updates
@@ -72,12 +73,16 @@ func (s *sprite) Costume(name string) {
 func (s *sprite) Angle(angleDegrees float64) {
 	s.angleRad = angleDegrees * (math.Pi / 180.0)
 	s.fullUpdate()
+
+	s.clickBody.Angle(s.angleRad)
 }
 
 func (s *sprite) Pos(cartX, cartY float64) {
 	s.x = cartX
 	s.y = cartY
 	s.minUpdate()
+
+	s.clickBody.Pos(s.x, s.y)
 }
 
 func (s *sprite) Z(z int) {
@@ -122,26 +127,29 @@ func (s *sprite) All(in models.SpriteState) {
 	s.x = in.X
 	s.y = in.Y
 	s.z = in.Z
-	s.angleRad = in.Angle
+	s.angleRad = in.AngleDegrees * (math.Pi / 180.0)
 	s.visible = in.Visible
 	s.opacity = in.Opacity
 	s.scaleX = in.ScaleX
 	s.scaleY = in.ScaleY
 
 	s.fullUpdate()
+
+	s.clickBody.Pos(s.x, s.y)
+	s.clickBody.Angle(s.angleRad)
 }
 
 func (s *sprite) GetState() models.SpriteState {
 	return models.SpriteState{
-		CostumeName: s.constumeName,
-		X:           s.x,
-		Y:           s.y,
-		Z:           s.z,
-		Angle:       s.angleRad,
-		Visible:     s.visible,
-		ScaleX:      s.scaleX,
-		ScaleY:      s.scaleY,
-		Opacity:     s.opacity,
+		CostumeName:  s.constumeName,
+		X:            s.x,
+		Y:            s.y,
+		Z:            s.z,
+		AngleDegrees: s.angleRad * (180.0 / math.Pi),
+		Visible:      s.visible,
+		ScaleX:       s.scaleX,
+		ScaleY:       s.scaleY,
+		Opacity:      s.opacity,
 	}
 }
 
@@ -151,62 +159,30 @@ func (s *sprite) DeleteSprite() {
 		return
 	}
 
-	update := spriteCmdDelete{
-		SpriteIndex: s.spriteID,
+	s.sim.DeleteSprite(s)
+}
+
+func (s *sprite) GetClickBody() models.ClickOnBody {
+	return s.clickBody
+}
+
+func (s *sprite) PressedUserInput() *models.UserInput {
+	return s.sim.PressedUserInput()
+}
+
+func (s *sprite) JustPressedUserInput() *models.UserInput {
+	if s.userInputChan == nil {
+		s.userInputChan = s.sim.SubscribeToJustPressedUserInput()
 	}
-	s.sim.cmdChan <- update
-}
 
-///////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////
+	select {
+	case i := <-s.userInputChan:
+		return i
+	default:
+		// receiving from chan would block without this
+	}
 
-type spriteAddNewSprite struct {
-	SpriteID int
-}
-
-type spriteUpdateMin struct {
-	SpriteIndex int
-	CostumeName string
-	X           float64
-	Y           float64
-}
-
-type spriteUpdateFull struct {
-	SpriteIndex int
-	CostumeName string
-	X           float64
-	Y           float64
-	Z           int
-	Angle       float64
-	Visible     bool
-	XScale      float64
-	YScale      float64
-	Opacity     float64
-}
-
-type spriteCmdDelete struct {
-	SpriteIndex int
-}
-
-type spriteCmdDeleteAll struct {
-	SpriteIndex int
-}
-
-type spriteAddCostume struct {
-	costumeName string
-	img         image.Image
-}
-
-type cmdAddSound struct {
-	path      string
-	soundName string
-}
-
-type cmdPlaySound struct {
-	soundName string
-	volume    float64 // between 0 and 1.
+	return nil
 }
 
 func (s *sprite) minUpdate() {
@@ -215,13 +191,13 @@ func (s *sprite) minUpdate() {
 		return
 	}
 
-	update := spriteUpdateMin{
+	update := models.CmdSpriteUpdateMin{
 		SpriteIndex: s.spriteID,
 		CostumeName: s.constumeName,
 		X:           s.x,
 		Y:           s.y,
 	}
-	s.sim.cmdChan <- update
+	s.sim.SpriteMinUpdate(&update)
 }
 
 func (s *sprite) fullUpdate() {
@@ -230,7 +206,7 @@ func (s *sprite) fullUpdate() {
 		return
 	}
 
-	update := spriteUpdateFull{
+	update := models.CmdSpriteUpdateFull{
 		SpriteIndex: s.spriteID,
 		CostumeName: s.constumeName,
 		X:           s.x,
@@ -242,5 +218,5 @@ func (s *sprite) fullUpdate() {
 		YScale:      s.scaleY,
 		Opacity:     s.opacity,
 	}
-	s.sim.cmdChan <- update
+	s.sim.SpriteFullUpdate(&update)
 }

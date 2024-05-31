@@ -6,13 +6,15 @@ type SpriteState struct {
 	CostumeName    string
 	X, Y           float64
 	Z              int // Effetively the layer index. 0 through 9 with 9 being the top.
-	Angle          float64
+	AngleDegrees   float64
 	Visible        bool
 	ScaleX, ScaleY float64
 	Opacity        float64
 }
 
 type Sprite interface {
+	GetSpriteID() int
+
 	// Updates
 	Costume(name string)
 	Angle(angleDegrees float64)
@@ -26,6 +28,13 @@ type Sprite interface {
 
 	// Info
 	GetState() SpriteState
+
+	// Click Body
+	GetClickBody() ClickOnBody
+
+	// User Input
+	PressedUserInput() *UserInput
+	JustPressedUserInput() *UserInput
 
 	// exit
 	DeleteSprite()

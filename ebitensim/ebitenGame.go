@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/tools"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -34,18 +35,21 @@ type ebitenSprite struct {
 ////////////////////////////////
 
 type EbitenGame struct {
-	screenWidth  int
-	screenHeight int
-	showFPS      bool
+	screenWidth       int
+	screenHeight      int
+	showFPS           bool
+	justPressedBroker *tools.Broker[*models.UserInput]
+	exitFlag          bool
 
-	controlState SavedControlState
-	controls     *models.UserInput
+	controlState         SavedControlState
+	controlsPressed      *models.UserInput
+	controlsJustPresssed *models.UserInput
 
 	cmdChan       chan any
 	spriteMutex   sync.Mutex // only for protecting nextSpriteID
 	nextSpriteID  int
 	idToSpriteMap map[int]*ebitenSprite
-	sprites       [][]*ebitenSprite // The sprites separated into layers 0 through 9
+	sprites       [][]*ebitenSprite // The sprites seperated into layers 0 through 9
 
 	costumes           []ebiten.Image
 	nameToCostumeIDMap map[string]int
@@ -55,11 +59,19 @@ type EbitenGame struct {
 	sounds       map[string][]byte
 }
 
-func NewGame(width, height int, showFPS bool) *EbitenGame {
+type GameInitStruct struct {
+	width             int
+	height            int
+	showFPS           bool
+	justPressedBroker *tools.Broker[*models.UserInput]
+}
+
+func NewGame(init GameInitStruct) *EbitenGame {
 	g := &EbitenGame{
-		screenWidth:  width,
-		screenHeight: height,
-		showFPS:      showFPS,
+		screenWidth:       init.width,
+		screenHeight:      init.height,
+		showFPS:           init.showFPS,
+		justPressedBroker: init.justPressedBroker,
 
 		cmdChan:       make(chan any, 100000),
 		nextSpriteID:  3599,
@@ -77,7 +89,7 @@ func NewGame(width, height int, showFPS bool) *EbitenGame {
 		g.sprites[i] = make([]*ebitenSprite, 0, 1000)
 	}
 
-	ebiten.SetTPS(120)
+	// ebiten.SetTPS(120)
 	// ebiten.SetVsyncEnabled(false) // For some reason, on Windows, there is quite a bit of lag.
 	// setting this to false clears it up, but also makes it run at 1000Hz...
 	ebiten.SetWindowSize(g.screenWidth, g.screenHeight)
@@ -86,7 +98,7 @@ func NewGame(width, height int, showFPS bool) *EbitenGame {
 }
 
 func (g *EbitenGame) deleteAllSprite() {
-	// Deleting everything means just allocating new arrays.
+	// Deleting everything means just allowcating new arrays.
 	g.idToSpriteMap = make(map[int]*ebitenSprite, 10000)
 	g.sprites = make([][]*ebitenSprite, 10)
 	for i := 0; i < 10; i++ {
@@ -160,7 +172,7 @@ EatSpritesCmdLoop:
 		select {
 		case cmd := <-g.cmdChan:
 			switch v := cmd.(type) {
-			case spriteUpdateMin:
+			case models.CmdSpriteUpdateMin:
 				s, ok := g.idToSpriteMap[v.SpriteIndex]
 				if !ok {
 					log.Printf("The given sprite index is not valid: %d\n", v.SpriteIndex)
@@ -176,7 +188,7 @@ EatSpritesCmdLoop:
 				s.x = v.X
 				s.y = v.Y
 
-			case spriteUpdateFull:
+			case models.CmdSpriteUpdateFull:
 				s, ok := g.idToSpriteMap[v.SpriteIndex]
 				if !ok {
 					log.Printf("The given sprite index is not valid: %d\n", v.SpriteIndex)
@@ -199,20 +211,20 @@ EatSpritesCmdLoop:
 				s.xScale = v.XScale
 				s.yScale = v.YScale
 				s.opacity = v.Opacity
-			case spriteAddNewSprite:
+			case models.CmdAddNewSprite:
 				g.addSprite(v.SpriteID)
-			case spriteAddCostume:
-				g.addSpriteCostume(v.img, v.costumeName)
-			case spriteCmdDelete:
+			case models.CmdAddCostume:
+				g.addSpriteCostume(v.Img, v.CostumeName)
+			case models.CmdSpriteDelete:
 				g.deleteSprite(v.SpriteIndex)
-			case spriteCmdDeleteAll:
+			case models.CmdSpritesDeleteAll:
 				g.deleteAllSprite()
 			// Sounds
-			case cmdAddSound:
-				g.addSound(v.path, v.soundName)
+			case models.CmdAddSound:
+				g.addSound(v.Path, v.SoundName)
 
-			case cmdPlaySound:
-				g.playSound(v.soundName, v.volume)
+			case models.CmdPlaySound:
+				g.playSound(v.SoundName, v.Volume)
 
 			default:
 				log.Printf("I don't know about type %T!\n", v)
@@ -236,7 +248,14 @@ func (g *EbitenGame) RunGame() {
 }
 
 func (g *EbitenGame) Update() error {
-	g.controls = g.controlState.GetUserInput()
+	if g.exitFlag {
+		return ebiten.Termination
+	}
+
+	g.controlsPressed, g.controlsJustPresssed = g.controlState.GetUserInput(g.screenWidth, g.screenHeight)
+	if g.controlsJustPresssed.AnyPressed {
+		g.justPressedBroker.Publish(g.controlsJustPresssed)
+	}
 
 	g.processSpriteCommands()
 
@@ -288,10 +307,10 @@ func (g *EbitenGame) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return g.screenWidth, g.screenHeight
 }
 
-func (g *EbitenGame) getUserInput() models.UserInput {
-	if g == nil || g.controls == nil {
-		return models.UserInput{}
+func (g *EbitenGame) PressedUserInput() *models.UserInput {
+	if g == nil || g.controlsPressed == nil {
+		return &models.UserInput{}
 	}
 
-	return *g.controls
+	return g.controlsPressed
 }
