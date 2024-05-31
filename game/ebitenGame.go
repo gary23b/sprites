@@ -41,15 +41,15 @@ type EbitenGame struct {
 	justPressedBroker *tools.Broker[*models.UserInput]
 	exitFlag          bool
 
-	controlState         SavedControlState
-	controlsPressed      *models.UserInput
-	controlsJustPresssed *models.UserInput
+	controlState        SavedControlState
+	controlsPressed     *models.UserInput
+	controlsJustPressed *models.UserInput
 
 	cmdChan      chan any
 	spriteMutex  sync.Mutex // only for protecting nextSpriteID
 	nextSpriteID int
 	idToSprite   []*ebitenSprite
-	sprites      [][]*ebitenSprite // The sprites seperated into layers 0 through 9
+	sprites      [][]*ebitenSprite // The sprites separated into layers 0 through 9
 
 	costumes           []ebiten.Image
 	nameToCostumeIDMap map[string]int
@@ -98,7 +98,7 @@ func NewGame(init GameInitStruct) *EbitenGame {
 }
 
 func (g *EbitenGame) deleteAllSprite() {
-	// Deleting everything means just allowcating new arrays.
+	// Deleting everything means just allocating new arrays.
 	g.idToSprite = make([]*ebitenSprite, 0, 31000)
 	g.sprites = make([][]*ebitenSprite, 10)
 	for i := 0; i < 10; i++ {
@@ -247,9 +247,9 @@ func (g *EbitenGame) Update() error {
 		return ebiten.Termination
 	}
 
-	g.controlsPressed, g.controlsJustPresssed = g.controlState.GetUserInput(g.screenWidth, g.screenHeight)
-	if g.controlsJustPresssed.AnyPressed {
-		g.justPressedBroker.Publish(g.controlsJustPresssed)
+	g.controlsPressed, g.controlsJustPressed = g.controlState.GetUserInput(g.screenWidth, g.screenHeight)
+	if g.controlsJustPressed.AnyPressed {
+		g.justPressedBroker.Publish(g.controlsJustPressed)
 	}
 
 	g.processSpriteCommands()
@@ -281,7 +281,7 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 			op.GeoM.Scale(sprite.xScale, sprite.yScale)
 			op.GeoM.Rotate(-sprite.angleRad) // This command rotates clockwise for some reason.
 
-			op.GeoM.Translate(float64(g.screenWidth/2), float64(g.screenHeight/2)) // (0,0) is in the center for Cartesian cordinates
+			op.GeoM.Translate(float64(g.screenWidth/2), float64(g.screenHeight/2)) // (0,0) is in the center for Cartesian coordinates
 			op.GeoM.Translate(sprite.x, -sprite.y)
 
 			if sprite.opacity != 100 {

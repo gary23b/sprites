@@ -84,7 +84,7 @@ func (s *canvas) SetCartesianPixel(x, y float64) {
 }
 
 // This is what splits cartesian space into discrete pixels.
-// This includes moveing (0,0) be be centered in the middle of the (0,0) pixel. The center of the (0,0) pixel is at (.5, .5)
+// This includes moving (0,0) be be centered in the middle of the (0,0) pixel. The center of the (0,0) pixel is at (.5, .5)
 func floatPosToPixel(x, y float64) (int, int) {
 	retX := int(math.Floor(x + .5))
 	retY := int(math.Floor(y + .5))
@@ -130,7 +130,7 @@ func (s *canvas) DrawFilledCircle(x, y, size float64) {
 	}
 
 	halfSize := size / 2
-	halfSizeSqrd := halfSize * halfSize
+	halfSizeSquared := halfSize * halfSize
 	xMax := int(math.Floor(x + halfSize))
 	xMin := int(math.Floor(x - halfSize))
 	yMax := int(math.Floor(y + halfSize))
@@ -142,8 +142,8 @@ func (s *canvas) DrawFilledCircle(x, y, size float64) {
 			xFlt := float64(xInt)
 			deltaX := (float64(xInt) - x)
 			deltaY := (float64(yInt) - y)
-			distanceSqrd := deltaX*deltaX + deltaY*deltaY
-			if distanceSqrd <= halfSizeSqrd {
+			distanceSquared := deltaX*deltaX + deltaY*deltaY
+			if distanceSquared <= halfSizeSquared {
 				s.SetCartesianPixel(xFlt, yFlt)
 			}
 		}

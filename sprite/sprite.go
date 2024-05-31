@@ -27,37 +27,37 @@ func LoadSpriteFile(path string) (image.Image, error) {
 type sprite struct {
 	sim models.Scratch
 
-	spriteID     int
-	spriteType   int
-	UniqueName   string
-	constumeName string
-	x, y         float64
-	z            int
-	angleRad     float64
-	visible      bool
-	opacity      float64
-	scaleX       float64
-	scaleY       float64
+	spriteID    int
+	spriteType  int
+	UniqueName  string
+	costumeName string
+	x, y        float64
+	z           int
+	angleRad    float64
+	visible     bool
+	opacity     float64
+	scaleX      float64
+	scaleY      float64
 
 	deleted bool
 
 	clickBody     models.ClickOnBody
 	userInputChan chan *models.UserInput
-	rcvdMsgs      chan any
+	receivedMsgs  chan any
 }
 
 var _ models.Sprite = &sprite{}
 
 func NewSprite(sim models.Scratch, UniqueName string, spriteID int) *sprite {
 	ret := &sprite{
-		spriteID:   spriteID,
-		UniqueName: UniqueName,
-		opacity:    100,
-		scaleX:     1,
-		scaleY:     1,
-		sim:        sim,
-		clickBody:  tools.NewTouchCollisionBody(),
-		rcvdMsgs:   make(chan any, 10),
+		spriteID:     spriteID,
+		UniqueName:   UniqueName,
+		opacity:      100,
+		scaleX:       1,
+		scaleY:       1,
+		sim:          sim,
+		clickBody:    tools.NewTouchCollisionBody(),
+		receivedMsgs: make(chan any, 10),
 	}
 	return ret
 }
@@ -81,7 +81,7 @@ func (s *sprite) GetUniqueName() string {
 
 // Updates
 func (s *sprite) Costume(name string) {
-	s.constumeName = name
+	s.costumeName = name
 	s.fullUpdate()
 }
 
@@ -144,7 +144,7 @@ func (s *sprite) All(in models.SpriteState) {
 	}
 
 	s.spriteType = in.SpriteType
-	s.constumeName = in.CostumeName
+	s.costumeName = in.CostumeName
 	s.x = in.X
 	s.y = in.Y
 	s.z = in.Z
@@ -165,7 +165,7 @@ func (s *sprite) GetState() models.SpriteState {
 		SpriteID:     s.spriteID,
 		SpriteType:   s.spriteType,
 		UniqueName:   s.UniqueName,
-		CostumeName:  s.constumeName,
+		CostumeName:  s.costumeName,
 		X:            s.x,
 		Y:            s.y,
 		Z:            s.z,
@@ -227,21 +227,21 @@ func (s *sprite) SendMsg(toSpriteID int, msg any) {
 func (s *sprite) GetMsgs() []any {
 	msgs := []any{}
 
-GetAllRcvdMsgs:
+GetAllReceivedMsgs:
 	for {
 		select {
-		case i := <-s.rcvdMsgs:
+		case i := <-s.receivedMsgs:
 			msgs = append(msgs, i)
 		default:
 			// receiving from chan would block without this
-			break GetAllRcvdMsgs
+			break GetAllReceivedMsgs
 		}
 	}
 	return msgs
 }
 
 func (s *sprite) AddMsg(msg any) {
-	s.rcvdMsgs <- msg
+	s.receivedMsgs <- msg
 }
 
 func (s *sprite) minUpdate() {

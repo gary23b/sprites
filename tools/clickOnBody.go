@@ -34,7 +34,7 @@ func NewTouchCollisionBody() *ClickOnBody {
 	return ret
 }
 
-func (s *ClickOnBody) AddCirleBody(x, y, radius float64) {
+func (s *ClickOnBody) AddCircleBody(x, y, radius float64) {
 	newC := circle{
 		x:      x,
 		y:      y,
@@ -152,12 +152,12 @@ func overlapCircles(c1, c2 *circle) bool {
 	return distance < c1.radius+c2.radius
 }
 
-func overlapCircleRectange(c *circle, r *rectangle) bool {
+func overlapCircleRectangle(c *circle, r *rectangle) bool {
 	// should check radius of caring first
 	//
 
 
-	//git the relative position of the circle compared to the recangle
+	//git the relative position of the circle compared to the rectangle
 	x := c.x - r.x
 
 	//rotate the circle center by the rotation of the rectangle

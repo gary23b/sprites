@@ -7,7 +7,7 @@
 
 ## Go Sprites is for simulating actor model sprites in a 2D world 
 
-Golang Sprites is a Reimagining of [Scratch](https://scratch.mit.edu/) created by MIT Media Lab. Every entity on the screen is a sprite that can be programmed independently.
+Golang Sprites is a reimagining of [Scratch](https://scratch.mit.edu/) created by MIT Media Lab. Every entity on the screen is a sprite that can be programmed independently.
 
 The goals are many:
 
