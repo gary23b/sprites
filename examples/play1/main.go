@@ -1,10 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/gary23b/sprites"
@@ -18,23 +16,23 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return !errors.Is(err, os.ErrNotExist)
-}
+// func fileExists(path string) bool {
+// 	_, err := os.Stat(path)
+// 	return !errors.Is(err, os.ErrNotExist)
+// }
 
 func simStartFunc(sim models.Scratch) {
 	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t1")
 
-	if fileExists("jab.wav") {
-		sim.AddSound("jab.wav", "jab")
-		sim.AddSound("jump.ogg", "jump")
-		sim.AddSound("ragtime.mp3", "ragtime")
-	} else {
-		sim.AddSound("./examples/play1/jab.wav", "jab")
-		sim.AddSound("./examples/play1/jump.ogg", "jump")
-		sim.AddSound("./examples/play1/ragtime.mp3", "ragtime")
-	}
+	// if fileExists("jab.wav") {
+	// 	sim.AddSound("jab.wav", "jab")
+	// 	sim.AddSound("jump.ogg", "jump")
+	// 	sim.AddSound("ragtime.mp3", "ragtime")
+	// } else {
+	// 	sim.AddSound("./examples/play1/jab.wav", "jab")
+	// 	sim.AddSound("./examples/play1/jump.ogg", "jump")
+	// 	sim.AddSound("./examples/play1/ragtime.mp3", "ragtime")
+	// }
 
 	// sim.PlaySound("ragtime", .1)
 
@@ -84,12 +82,12 @@ func testScene(sim models.Scratch) {
 	s.Opacity(30)
 	// s.Angle(45)
 
-	sim.PlaySound("jump", .6)
+	// sim.PlaySound("jump", .6)
 	broker.Publish("delete all")
 
 	time.Sleep(time.Second * 10)
 	sim.DeleteAllSprites()
-	sim.PlaySound("jab", .5)
+	// sim.PlaySound("jab", .5)
 	time.Sleep(time.Millisecond * 20)
 
 	broker.Stop()
