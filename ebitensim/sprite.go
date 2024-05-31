@@ -164,14 +164,13 @@ func (s *sprite) GetState() models.SpriteState {
 	}
 }
 
-// exit
 func (s *sprite) DeleteSprite() {
 	if s.deleted {
 		log.Printf("Error: sprite %d is deleted but being deleted again\n", s.spriteID)
 		return
 	}
 
-	update := spriteUpdateDelete{
+	update := spriteCmdDelete{
 		SpriteIndex: s.spriteID,
 	}
 	s.sim.cmdChan <- update
@@ -206,7 +205,11 @@ type spriteUpdateFull struct {
 	Opacity     float64
 }
 
-type spriteUpdateDelete struct {
+type spriteCmdDelete struct {
+	SpriteIndex int
+}
+
+type spriteCmdDeleteAll struct {
 	SpriteIndex int
 }
 

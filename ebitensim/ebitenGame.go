@@ -59,7 +59,7 @@ func NewGame(width, height int, showFPS bool) *EbitenGame {
 		screenWidth:   width,
 		screenHeight:  height,
 		showFPS:       showFPS,
-		spritesChan:   make(chan any, 10000),
+		spritesChan:   make(chan any, 100000),
 		sprites:       make([][]*ebitenSprite, 10),
 		spritesImgMap: make(map[string]*ebiten.Image),
 		spriteMap:     make(map[int]*ebitenSprite, 10000),
@@ -69,12 +69,21 @@ func NewGame(width, height int, showFPS bool) *EbitenGame {
 		g.sprites[i] = make([]*ebitenSprite, 0, 1000)
 	}
 
-	// ebiten.SetTPS(120)
+	ebiten.SetTPS(120)
 	// ebiten.SetVsyncEnabled(false) // For some reason, on Windows, there is quite a bit of lag.
 	// setting this to false clears it up, but also makes it run at 1000Hz...
 	ebiten.SetWindowSize(g.screenWidth, g.screenHeight)
 	ebiten.SetWindowTitle("Go Turtle Graphics")
 	return g
+}
+
+func (g *EbitenGame) deleteAllSprite() {
+	// Deleting everything means just allocating new arrays.
+	g.spriteMap = make(map[int]*ebitenSprite, 10000)
+	g.sprites = make([][]*ebitenSprite, 10)
+	for i := 0; i < 10; i++ {
+		g.sprites[i] = make([]*ebitenSprite, 0, 1000)
+	}
 }
 
 func (g *EbitenGame) GetSpriteCmdChannel() chan any {
@@ -218,8 +227,10 @@ EatSpritesCmdLoop:
 				g.addSprite(v.SpriteID)
 			case spriteAddCostume:
 				g.addSpriteCostume(v.SpriteIndex, v.img, v.costumeName)
-			case spriteUpdateDelete:
+			case spriteCmdDelete:
 				g.deleteSprite(v.SpriteIndex)
+			case spriteCmdDeleteAll:
+				g.deleteAllSprite()
 
 			default:
 				log.Printf("I don't know about type %T!\n", v)

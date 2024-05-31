@@ -25,8 +25,9 @@ func simStartFunc(sim models.Sim) {
 	s.Scale(10)
 	s.Z(0)
 	s.Visible(true)
+	time.Sleep(time.Millisecond * 20)
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 2000; i++ {
 		go turtle(sim)
 	}
 
@@ -39,6 +40,11 @@ func simStartFunc(sim models.Sim) {
 	s.Opacity(30)
 	// s.Angle(45)
 
+	time.Sleep(time.Second * 10)
+	sim.DeleteAllSprites()
+	time.Sleep(time.Millisecond * 20)
+
+	simStartFunc(sim)
 }
 
 func turtle(sim models.Sim) {
@@ -62,6 +68,6 @@ func turtle(sim models.Sim) {
 
 	}
 
-	time.Sleep(time.Millisecond * time.Duration(rand.Float64()*10000))
+	//time.Sleep(time.Millisecond * time.Duration(rand.Float64()*10000))
 	//s.DeleteSprite()
 }

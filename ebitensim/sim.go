@@ -41,6 +41,11 @@ func (s *simStruct) AddSprite() models.Sprite {
 	return ret
 }
 
+func (sim *simStruct) DeleteAllSprites() {
+	update := spriteCmdDeleteAll{}
+	sim.cmdChan <- update
+}
+
 func (s *simStruct) GetWidth() int {
 	return s.width
 }
