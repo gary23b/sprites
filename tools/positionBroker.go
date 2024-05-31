@@ -1,4 +1,4 @@
-package ebitensim
+package tools
 
 import (
 	"log"
@@ -12,20 +12,20 @@ type brokerPosInfo struct {
 	mutex sync.RWMutex
 }
 
-type positionBroker struct {
+type PositionBroker struct {
 	sprites map[string]*brokerPosInfo
 	mutex   sync.RWMutex
 }
 
-func newPositionBroker() *positionBroker {
-	ret := &positionBroker{
+func NewPositionBroker() *PositionBroker {
+	ret := &PositionBroker{
 		sprites: make(map[string]*brokerPosInfo),
 	}
 
 	return ret
 }
 
-func (s *positionBroker) addSprite(name string) {
+func (s *PositionBroker) AddSprite(name string) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -38,13 +38,13 @@ func (s *positionBroker) addSprite(name string) {
 	s.sprites[name] = &brokerPosInfo{}
 }
 
-func (s *positionBroker) removeSprite(name string) {
+func (s *PositionBroker) RemoveSprite(name string) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	delete(s.sprites, name)
 }
 
-func (s *positionBroker) updateSpriteInfo(name string, state models.SpriteState) {
+func (s *PositionBroker) UpdateSpriteInfo(name string, state models.SpriteState) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	item, ok := s.sprites[name]
@@ -58,7 +58,7 @@ func (s *positionBroker) updateSpriteInfo(name string, state models.SpriteState)
 
 }
 
-func (s *positionBroker) getSpriteInfo(name string) models.SpriteState {
+func (s *PositionBroker) GetSpriteInfo(name string) models.SpriteState {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	item, ok := s.sprites[name]

@@ -1,4 +1,4 @@
-package ebitensim
+package sprite
 
 import (
 	"bytes"
@@ -40,15 +40,13 @@ type sprite struct {
 
 	deleted bool
 
-	costumeMap map[string]int
-
 	clickBody     *tools.ClickOnBody
 	userInputChan chan *models.UserInput
 }
 
 var _ models.Sprite = &sprite{}
 
-func newSprite(sim models.Sim, UniqueName string, spriteID int) *sprite {
+func NewSprite(sim models.Sim, UniqueName string, spriteID int) *sprite {
 	ret := &sprite{
 		spriteID:   spriteID,
 		UniqueName: UniqueName,
@@ -56,7 +54,6 @@ func newSprite(sim models.Sim, UniqueName string, spriteID int) *sprite {
 		scaleX:     1,
 		scaleY:     1,
 		sim:        sim,
-		costumeMap: make(map[string]int),
 		clickBody:  tools.NewTouchCollisionBody(),
 	}
 	return ret

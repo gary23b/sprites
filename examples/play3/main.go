@@ -3,18 +3,18 @@ package main
 import (
 	"time"
 
-	"github.com/gary23b/sprites/ebitensim"
 	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/sim"
 	"github.com/gary23b/sprites/tools"
 )
 
 func main() {
-	params := ebitensim.SimParams{
+	params := sim.SimParams{
 		Width:   1000,
 		Height:  1000,
 		ShowFPS: true,
 	}
-	ebitensim.StartSim(params, simStartFunc)
+	sim.StartSim(params, simStartFunc)
 }
 
 func simStartFunc(sim models.Sim) {

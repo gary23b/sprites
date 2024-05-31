@@ -1,4 +1,4 @@
-package ebitensim
+package game
 
 import (
 	"github.com/gary23b/sprites/models"

@@ -1,4 +1,4 @@
-package ebitensim
+package game
 
 import (
 	"fmt"
@@ -60,18 +60,18 @@ type EbitenGame struct {
 }
 
 type GameInitStruct struct {
-	width             int
-	height            int
-	showFPS           bool
-	justPressedBroker *tools.Broker[*models.UserInput]
+	Width             int
+	Height            int
+	ShowFPS           bool
+	JustPressedBroker *tools.Broker[*models.UserInput]
 }
 
 func NewGame(init GameInitStruct) *EbitenGame {
 	g := &EbitenGame{
-		screenWidth:       init.width,
-		screenHeight:      init.height,
-		showFPS:           init.showFPS,
-		justPressedBroker: init.justPressedBroker,
+		screenWidth:       init.Width,
+		screenHeight:      init.Height,
+		showFPS:           init.ShowFPS,
+		justPressedBroker: init.JustPressedBroker,
 
 		cmdChan:      make(chan any, 100000),
 		nextSpriteID: 0,
@@ -108,6 +108,10 @@ func (g *EbitenGame) deleteAllSprite() {
 
 func (g *EbitenGame) GetSpriteCmdChannel() chan any {
 	return g.cmdChan
+}
+
+func (g *EbitenGame) TellGameToExit() {
+	g.exitFlag = true
 }
 
 func (g *EbitenGame) GetNextSpriteID() int {

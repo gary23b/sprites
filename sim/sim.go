@@ -1,22 +1,24 @@
-package ebitensim
+package sim
 
 import (
 	"image"
 	"log"
 	"math"
 
+	"github.com/gary23b/sprites/game"
 	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/sprite"
 	"github.com/gary23b/sprites/tools"
 )
 
 type simStruct struct {
 	width   int
 	height  int
-	g       *EbitenGame
+	g       *game.EbitenGame
 	cmdChan chan any
 
 	justPressedBroker *tools.Broker[*models.UserInput]
-	posBroker         *positionBroker
+	posBroker         *tools.PositionBroker
 }
 
 var _ models.Sim = &simStruct{} // Force the linter to tell us if the interface is implemented
@@ -35,23 +37,23 @@ func StartSim(params SimParams, simStartFunc func(models.Sim)) {
 		width:             params.Width,
 		height:            params.Height,
 		justPressedBroker: tools.NewBroker[*models.UserInput](),
-		posBroker:         newPositionBroker(),
+		posBroker:         tools.NewPositionBroker(),
 	}
 
-	gameInit := GameInitStruct{
-		width:             params.Width,
-		height:            params.Height,
-		showFPS:           params.ShowFPS,
-		justPressedBroker: ret.justPressedBroker,
+	gameInit := game.GameInitStruct{
+		Width:             params.Width,
+		Height:            params.Height,
+		ShowFPS:           params.ShowFPS,
+		JustPressedBroker: ret.justPressedBroker,
 	}
-	ret.g = NewGame(gameInit)
+	ret.g = game.NewGame(gameInit)
 	ret.cmdChan = ret.g.GetSpriteCmdChannel()
 	go simStartFunc(ret)
 	ret.g.RunGame()
 }
 
 func (s *simStruct) Exit() {
-	s.g.exitFlag = true
+	s.g.TellGameToExit()
 }
 
 func (s *simStruct) AddSprite(UniqueName string) models.Sprite {
@@ -61,14 +63,14 @@ func (s *simStruct) AddSprite(UniqueName string) models.Sprite {
 	}
 	s.cmdChan <- update
 
-	s.posBroker.addSprite(UniqueName)
-	ret := newSprite(s, UniqueName, spriteID)
-	s.posBroker.updateSpriteInfo(UniqueName, ret.GetState())
+	s.posBroker.AddSprite(UniqueName)
+	ret := sprite.NewSprite(s, UniqueName, spriteID)
+	s.posBroker.UpdateSpriteInfo(UniqueName, ret.GetState())
 	return ret
 }
 
 func (s *simStruct) DeleteSprite(in models.Sprite) {
-	s.posBroker.removeSprite(in.GetUniqueName())
+	s.posBroker.RemoveSprite(in.GetUniqueName())
 	update := models.CmdSpriteDelete{
 		SpriteID: in.GetSpriteID(),
 	}
@@ -78,12 +80,12 @@ func (s *simStruct) DeleteSprite(in models.Sprite) {
 func (s *simStruct) DeleteAllSprites() {
 	update := models.CmdSpritesDeleteAll{}
 	s.cmdChan <- update
-	s.posBroker = newPositionBroker()
+	s.posBroker = tools.NewPositionBroker()
 }
 
 func (s *simStruct) SpriteUpdatePosAngle(in models.Sprite) {
 	status := in.GetState()
-	s.posBroker.updateSpriteInfo(status.UniqueName, status)
+	s.posBroker.UpdateSpriteInfo(status.UniqueName, status)
 	cmd := models.CmdSpriteUpdateMin{
 		SpriteID: status.SpriteID,
 		X:        status.X,
@@ -96,7 +98,7 @@ func (s *simStruct) SpriteUpdatePosAngle(in models.Sprite) {
 
 func (s *simStruct) SpriteUpdateFull(in models.Sprite) {
 	status := in.GetState()
-	s.posBroker.updateSpriteInfo(status.UniqueName, status)
+	s.posBroker.UpdateSpriteInfo(status.UniqueName, status)
 	cmd := models.CmdSpriteUpdateFull{
 		SpriteID:    status.SpriteID,
 		CostumeName: status.CostumeName,
@@ -114,7 +116,7 @@ func (s *simStruct) SpriteUpdateFull(in models.Sprite) {
 }
 
 func (s *simStruct) GetSpriteInfo(UniqueName string) models.SpriteState {
-	return s.posBroker.getSpriteInfo(UniqueName)
+	return s.posBroker.GetSpriteInfo(UniqueName)
 }
 
 func (s *simStruct) GetWidth() int {
