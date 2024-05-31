@@ -1,12 +1,8 @@
 package ebitensim
 
 import (
-	"bytes"
-	"crypto/sha1"
-	"encoding/base64"
 	"fmt"
 	"image"
-	"image/png"
 	"log"
 	"sync"
 
@@ -17,21 +13,17 @@ import (
 )
 
 type ebitenSprite struct {
-	id         int
-	z          int
-	arrayIndex int
+	id         int // used in idToSpriteMap as the key to point to this struct
+	z          int // The current layer. 0-9 allowed
+	arrayIndex int // Used for moving a sprite to a new layer
 
-	spriteImage    []*ebiten.Image
-	spriteImageMap map[string]int
-	CostumeIndex   int
+	CostumeIndex int // the index to use to get the current sprite bitmap costume from g.costumes[]
 
 	x, y           float64
 	angleRad       float64
 	visible        bool
 	xScale, yScale float64
 	opacity        float64
-
-	deleted bool
 }
 
 ////////////////////////////////
@@ -44,25 +36,29 @@ type EbitenGame struct {
 	controlState SavedControlState
 	controls     *models.UserInput
 
-	spritesChan   chan any
-	spriteMutex   sync.Mutex
-	sprites       [][]*ebitenSprite
-	spriteImgs    []ebiten.Image
-	spritesImgMap map[string]*ebiten.Image
+	cmdChan       chan any
+	spriteMutex   sync.Mutex // only for protecting nextSpriteID
+	nextSpriteID  int
+	idToSpriteMap map[int]*ebitenSprite
+	sprites       [][]*ebitenSprite // The sprites separated into layers 0 through 9
 
-	nextSpriteIndex int
-	spriteMap       map[int]*ebitenSprite
+	costumes           []ebiten.Image
+	nameToCostumeIDMap map[string]int
 }
 
 func NewGame(width, height int, showFPS bool) *EbitenGame {
 	g := &EbitenGame{
-		screenWidth:   width,
-		screenHeight:  height,
-		showFPS:       showFPS,
-		spritesChan:   make(chan any, 100000),
+		screenWidth:  width,
+		screenHeight: height,
+		showFPS:      showFPS,
+
+		cmdChan:       make(chan any, 100000),
+		nextSpriteID:  3599,
 		sprites:       make([][]*ebitenSprite, 10),
-		spritesImgMap: make(map[string]*ebiten.Image),
-		spriteMap:     make(map[int]*ebitenSprite, 10000),
+		idToSpriteMap: make(map[int]*ebitenSprite, 10000),
+
+		costumes:           make([]ebiten.Image, 0, 1000),
+		nameToCostumeIDMap: make(map[string]int),
 	}
 
 	for i := 0; i < 10; i++ {
@@ -79,7 +75,7 @@ func NewGame(width, height int, showFPS bool) *EbitenGame {
 
 func (g *EbitenGame) deleteAllSprite() {
 	// Deleting everything means just allocating new arrays.
-	g.spriteMap = make(map[int]*ebitenSprite, 10000)
+	g.idToSpriteMap = make(map[int]*ebitenSprite, 10000)
 	g.sprites = make([][]*ebitenSprite, 10)
 	for i := 0; i < 10; i++ {
 		g.sprites[i] = make([]*ebitenSprite, 0, 1000)
@@ -87,92 +83,59 @@ func (g *EbitenGame) deleteAllSprite() {
 }
 
 func (g *EbitenGame) GetSpriteCmdChannel() chan any {
-	return g.spritesChan
+	return g.cmdChan
 }
 
 func (g *EbitenGame) GetNextSpriteID() int {
 	g.spriteMutex.Lock()
 	defer g.spriteMutex.Unlock()
 
-	newID := g.nextSpriteIndex
-	g.nextSpriteIndex++
+	newID := g.nextSpriteID
+	g.nextSpriteID++
 
 	return newID
 }
 
-func (g *EbitenGame) addSprite(newID int) int {
+func (g *EbitenGame) addSprite(newID int) {
 	newArrayIndex := len(g.sprites[0])
 	newSprite := ebitenSprite{
-		id:             newID,
-		z:              0,
-		arrayIndex:     newArrayIndex,
-		opacity:        100,
-		spriteImageMap: make(map[string]int),
+		id:           newID,
+		z:            0,
+		arrayIndex:   newArrayIndex,
+		opacity:      100,
+		CostumeIndex: -1,
 	}
 
 	g.sprites[0] = append(g.sprites[0], &newSprite)
-	g.spriteMap[newID] = g.sprites[0][newArrayIndex]
-
-	return newID
+	g.idToSpriteMap[newSprite.id] = g.sprites[0][newSprite.arrayIndex]
 }
 
-// Hash the image so we can check if we already have it.
-func hashImage(img image.Image) string {
-	w := &bytes.Buffer{}
-	err := png.Encode(w, img)
-	if err != nil {
-		panic(err)
-	}
+func (g *EbitenGame) addSpriteCostume(img image.Image, costumeName string) {
+	newSprite := ebiten.NewImageFromImage(img)
+	g.costumes = append(g.costumes, *newSprite)
+	g.nameToCostumeIDMap[costumeName] = len(g.costumes) - 1
 
-	h := sha1.New()
-	h.Write(w.Bytes())
-	resultBytes := h.Sum(nil)
-	resultKey := base64.StdEncoding.EncodeToString(resultBytes)
-	return resultKey
-}
-
-func (g *EbitenGame) addSpriteCostume(spriteIndex int, img image.Image, costumeName string) int {
-	resultKey := hashImage(img)
-
-	s, ok := g.spriteMap[spriteIndex]
-	if !ok {
-		log.Printf("The given sprite index is not valid: %d\n", spriteIndex)
-		return -1
-	}
-
-	spriteImage, ok := g.spritesImgMap[resultKey]
-	if !ok {
-		newSprite := ebiten.NewImageFromImage(img)
-		g.spriteImgs = append(g.spriteImgs, *newSprite)
-		spriteImage = &g.spriteImgs[len(g.spriteImgs)-1]
-		g.spritesImgMap[resultKey] = spriteImage
-
-		fmt.Println("creating a new sprite")
-	}
-
-	s.spriteImage = append(s.spriteImage, spriteImage)
-	s.spriteImageMap[costumeName] = len(s.spriteImage) - 1
-
-	return len(s.spriteImage) - 1
+	fmt.Println("creating a new sprite")
 }
 
 func (g *EbitenGame) deleteSprite(spriteIndex int) {
-	s, ok := g.spriteMap[spriteIndex]
+	s, ok := g.idToSpriteMap[spriteIndex]
 	if !ok {
 		log.Printf("The given sprite index is not valid: %d\n", spriteIndex)
 		return
 	}
-	delete(g.spriteMap, spriteIndex)
+	delete(g.idToSpriteMap, spriteIndex)
+	g.sprites[s.z][s.arrayIndex] = nil
 
 	s.visible = false
-	s.deleted = true
+	// Ideally when this function returns, there will be no more refs to the struct, so it will be garbage collected.
 }
 
 func (g *EbitenGame) moveSpriteToNewLayer(s *ebitenSprite, newZ int) *ebitenSprite {
 	g.sprites[s.z][s.arrayIndex] = nil
 	g.sprites[newZ] = append(g.sprites[newZ], s)
 	newIndex := len(g.sprites[newZ]) - 1
-	g.spriteMap[s.id] = s
+	g.idToSpriteMap[s.id] = s
 	s.arrayIndex = newIndex
 	s.z = newZ
 	return s
@@ -183,15 +146,16 @@ func (g *EbitenGame) processSpriteCommands() {
 EatSpritesCmdLoop:
 	for {
 		select {
-		case cmd := <-g.spritesChan:
+		case cmd := <-g.cmdChan:
 			switch v := cmd.(type) {
 			case spriteUpdateMin:
-				s, ok := g.spriteMap[v.SpriteIndex]
+				s, ok := g.idToSpriteMap[v.SpriteIndex]
 				if !ok {
 					log.Printf("The given sprite index is not valid: %d\n", v.SpriteIndex)
 					continue
 				}
-				costumeID, ok := s.spriteImageMap[v.CostumeName]
+
+				costumeID, ok := g.nameToCostumeIDMap[v.CostumeName]
 				if !ok {
 					log.Printf("The given costume name is not valid: %d, %s\n", v.SpriteIndex, v.CostumeName)
 					continue
@@ -201,7 +165,7 @@ EatSpritesCmdLoop:
 				s.y = v.Y
 
 			case spriteUpdateFull:
-				s, ok := g.spriteMap[v.SpriteIndex]
+				s, ok := g.idToSpriteMap[v.SpriteIndex]
 				if !ok {
 					log.Printf("The given sprite index is not valid: %d\n", v.SpriteIndex)
 					continue
@@ -210,7 +174,7 @@ EatSpritesCmdLoop:
 					s = g.moveSpriteToNewLayer(s, v.Z)
 				}
 
-				costumeID, ok := s.spriteImageMap[v.CostumeName]
+				costumeID, ok := g.nameToCostumeIDMap[v.CostumeName]
 				if !ok {
 					log.Printf("The given costume name is not valid: %d, %s\n", v.SpriteIndex, v.CostumeName)
 					continue
@@ -226,7 +190,7 @@ EatSpritesCmdLoop:
 			case spriteAddNewSprite:
 				g.addSprite(v.SpriteID)
 			case spriteAddCostume:
-				g.addSpriteCostume(v.SpriteIndex, v.img, v.costumeName)
+				g.addSpriteCostume(v.img, v.costumeName)
 			case spriteCmdDelete:
 				g.deleteSprite(v.SpriteIndex)
 			case spriteCmdDeleteAll:
@@ -274,12 +238,12 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 			if !sprite.visible {
 				continue
 			}
-			if len(sprite.spriteImage) == 0 {
+			if sprite.CostumeIndex < 0 {
 				continue
 			}
 			op.GeoM.Reset()
 			op.ColorScale.Reset()
-			costume := sprite.spriteImage[sprite.CostumeIndex]
+			costume := g.costumes[sprite.CostumeIndex]
 			w, h := costume.Bounds().Dx(), costume.Bounds().Dy()
 			op.GeoM.Translate(-float64(w)/2, -float64(h)/2) // Move the center to (0,0) so that we can rotate around the center.
 			op.GeoM.Scale(sprite.xScale, sprite.yScale)
@@ -292,7 +256,7 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 				op.ColorScale.SetA(float32(sprite.opacity) / 100)
 			}
 
-			screen.DrawImage(costume, &op)
+			screen.DrawImage(&costume, &op)
 
 		}
 	}

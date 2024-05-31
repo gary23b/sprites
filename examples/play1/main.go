@@ -18,16 +18,20 @@ func main() {
 }
 
 func simStartFunc(sim models.Sim) {
+	sim.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
+	testScene(sim)
+}
+
+func testScene(sim models.Sim) {
 
 	s := sim.AddSprite()
-	s.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
 	s.Costume("t1")
 	s.Scale(10)
 	s.Z(0)
 	s.Visible(true)
 	time.Sleep(time.Millisecond * 20)
 
-	for i := 0; i < 2000; i++ {
+	for i := 0; i < 30000; i++ {
 		go turtle(sim)
 	}
 
@@ -44,12 +48,11 @@ func simStartFunc(sim models.Sim) {
 	sim.DeleteAllSprites()
 	time.Sleep(time.Millisecond * 20)
 
-	simStartFunc(sim)
+	testScene(sim)
 }
 
 func turtle(sim models.Sim) {
 	s := sim.AddSprite()
-	s.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
 	s.Costume("t1")
 	s.Scale(.2)
 	s.Z(1)

@@ -1,7 +1,5 @@
 package models
 
-import "image"
-
 ///////////////////////
 
 type SpriteState struct {
@@ -15,9 +13,6 @@ type SpriteState struct {
 }
 
 type Sprite interface {
-	// Init
-	AddCostume(img image.Image, name string)
-
 	// Updates
 	Costume(name string)
 	Angle(angleDegrees float64)

@@ -63,25 +63,6 @@ func newSprite(sim *simStruct) *sprite {
 	return ret
 }
 
-func (s *sprite) AddCostume(img image.Image, name string) {
-	_, ok := s.costumeMap[name]
-	if ok {
-		return
-	}
-
-	if s.deleted {
-		log.Printf("Error: sprite %d is deleted but being updated\n", s.spriteID)
-		return
-	}
-
-	update := spriteAddCostume{
-		SpriteIndex: s.spriteID,
-		img:         img,
-		costumeName: name,
-	}
-	s.sim.cmdChan <- update
-}
-
 // Updates
 func (s *sprite) Costume(name string) {
 	s.constumeName = name
@@ -214,7 +195,6 @@ type spriteCmdDeleteAll struct {
 }
 
 type spriteAddCostume struct {
-	SpriteIndex int
 	costumeName string
 	img         image.Image
 }

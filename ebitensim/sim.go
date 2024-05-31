@@ -1,6 +1,7 @@
 package ebitensim
 
 import (
+	"image"
 	"log"
 
 	"github.com/gary23b/sprites/models"
@@ -62,4 +63,12 @@ func (s *simStruct) GetUserInput() models.UserInput {
 	ret.MouseY = -ret.MouseY + s.height/2
 
 	return ret
+}
+
+func (sim *simStruct) AddCostume(img image.Image, name string) {
+	update := spriteAddCostume{
+		img:         img,
+		costumeName: name,
+	}
+	sim.cmdChan <- update
 }
