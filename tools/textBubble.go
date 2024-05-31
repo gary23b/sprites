@@ -2,6 +2,7 @@ package tools
 
 import (
 	"image"
+	"image/color"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/truetype"
@@ -54,6 +55,26 @@ func CreateTextBubble(width, height float64, inputText string, size float64) ima
 
 	dc.SetColor(Black)
 	dc.DrawStringWrapped(inputText, 5, 5, 0.0, 0.0, width-10, 1, gg.AlignCenter)
+	img := dc.Image()
+
+	//fmt.Println(time.Since(startTime).Seconds()) // 1ms
+	return img
+}
+
+func CreateTextImg(inputText string, width, height, size float64, c color.Color) image.Image {
+	//startTime := time.Now()
+	font, err := truetype.Parse(goregular.TTF)
+	if err != nil {
+		panic("")
+	}
+	face := truetype.NewFace(font, &truetype.Options{
+		Size: size,
+	})
+
+	dc := gg.NewContext(int(width), int(height))
+	dc.SetFontFace(face)
+	dc.SetColor(c)
+	dc.DrawStringWrapped(inputText, 0, 0, 0.0, 0.0, width, 1, gg.AlignCenter)
 	img := dc.Image()
 
 	//fmt.Println(time.Since(startTime).Seconds()) // 1ms

@@ -4,12 +4,18 @@ import (
 	"image"
 )
 
+type NearMeInfo struct {
+	SpriteID   int
+	SpriteType int
+	X, Y       float64
+}
+
 type Scratch interface {
 	GetWidth() int
 	GetHeight() int
 
 	AddCostume(img image.Image, name string)
-	AddSprite(UniqueName string) Sprite
+	AddSprite(UniqueName string) Sprite // If no name is given, a random name is generated.
 	DeleteSprite(Sprite)
 	DeleteAllSprites()
 
@@ -23,7 +29,12 @@ type Scratch interface {
 	SubscribeToJustPressedUserInput() chan *UserInput
 	UnSubscribeToJustPressedUserInput(in chan *UserInput)
 
+	GetSpriteID(UniqueName string) int
 	GetSpriteInfo(UniqueName string) SpriteState
+	GetSpriteInfoByID(id int) SpriteState
+
+	WhoIsNearMe(x, y, distance float64) []NearMeInfo
+	SendMsg(toSpriteID int, msg any)
 
 	Exit()
 }

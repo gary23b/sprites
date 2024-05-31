@@ -1,9 +1,12 @@
 package sprites
 
 import (
+	"fmt"
 	"image"
 	"log"
 	"math"
+	"math/rand"
+	"sync"
 
 	"github.com/gary23b/sprites/game"
 	"github.com/gary23b/sprites/models"
@@ -19,6 +22,10 @@ type scratchState struct {
 
 	justPressedBroker *tools.Broker[*models.UserInput]
 	posBroker         *tools.PositionBroker
+
+	idToSpriteMapMutex sync.RWMutex
+	idToSpriteMap      map[int]models.Sprite
+	nameToSpriteMap    map[string]models.Sprite
 }
 
 var _ models.Scratch = &scratchState{} // Force the linter to tell us if the interface is implemented
@@ -38,6 +45,8 @@ func Start(params ScratchParams, simStartFunc func(models.Scratch)) {
 		height:            params.Height,
 		justPressedBroker: tools.NewBroker[*models.UserInput](),
 		posBroker:         tools.NewPositionBroker(),
+		idToSpriteMap:     make(map[int]models.Sprite),
+		nameToSpriteMap:   make(map[string]models.Sprite),
 	}
 
 	gameInit := game.GameInitStruct{
@@ -58,34 +67,54 @@ func (s *scratchState) Exit() {
 
 func (s *scratchState) AddSprite(UniqueName string) models.Sprite {
 	spriteID := s.g.GetNextSpriteID()
+	if UniqueName == "" {
+		UniqueName = fmt.Sprintf("rand%X%X", rand.Uint64(), rand.Uint64())
+	}
 	update := models.CmdAddNewSprite{
 		SpriteID: spriteID,
 	}
 	s.cmdChan <- update
 
-	s.posBroker.AddSprite(UniqueName)
+	s.posBroker.AddSprite(spriteID)
 	ret := sprite.NewSprite(s, UniqueName, spriteID)
-	s.posBroker.UpdateSpriteInfo(UniqueName, ret.GetState())
+
+	s.idToSpriteMapMutex.Lock()
+	s.idToSpriteMap[spriteID] = ret
+	s.nameToSpriteMap[UniqueName] = ret
+	s.idToSpriteMapMutex.Unlock()
+
+	s.posBroker.UpdateSpriteInfo(spriteID, ret.GetState())
 	return ret
 }
 
 func (s *scratchState) DeleteSprite(in models.Sprite) {
-	s.posBroker.RemoveSprite(in.GetUniqueName())
+	spriteID := in.GetSpriteID()
+	s.posBroker.RemoveSprite(spriteID)
 	update := models.CmdSpriteDelete{
-		SpriteID: in.GetSpriteID(),
+		SpriteID: spriteID,
 	}
 	s.cmdChan <- update
+
+	s.idToSpriteMapMutex.Lock()
+	delete(s.idToSpriteMap, spriteID)
+	delete(s.nameToSpriteMap, in.GetUniqueName())
+	s.idToSpriteMapMutex.Unlock()
 }
 
 func (s *scratchState) DeleteAllSprites() {
 	update := models.CmdSpritesDeleteAll{}
 	s.cmdChan <- update
 	s.posBroker = tools.NewPositionBroker()
+
+	s.idToSpriteMapMutex.Lock()
+	s.idToSpriteMap = make(map[int]models.Sprite)
+	s.nameToSpriteMap = make(map[string]models.Sprite)
+	s.idToSpriteMapMutex.Unlock()
 }
 
 func (s *scratchState) SpriteUpdatePosAngle(in models.Sprite) {
 	status := in.GetState()
-	s.posBroker.UpdateSpriteInfo(status.UniqueName, status)
+	s.posBroker.UpdateSpriteInfo(status.SpriteID, status)
 	cmd := models.CmdSpriteUpdateMin{
 		SpriteID: status.SpriteID,
 		X:        status.X,
@@ -98,7 +127,7 @@ func (s *scratchState) SpriteUpdatePosAngle(in models.Sprite) {
 
 func (s *scratchState) SpriteUpdateFull(in models.Sprite) {
 	status := in.GetState()
-	s.posBroker.UpdateSpriteInfo(status.UniqueName, status)
+	s.posBroker.UpdateSpriteInfo(status.SpriteID, status)
 	cmd := models.CmdSpriteUpdateFull{
 		SpriteID:    status.SpriteID,
 		CostumeName: status.CostumeName,
@@ -115,8 +144,23 @@ func (s *scratchState) SpriteUpdateFull(in models.Sprite) {
 	s.cmdChan <- cmd
 }
 
+func (s *scratchState) GetSpriteID(UniqueName string) int {
+	s.idToSpriteMapMutex.RLock()
+	sprite, ok := s.nameToSpriteMap[UniqueName]
+	s.idToSpriteMapMutex.RUnlock()
+	if !ok {
+		log.Printf("%s, doesn't exist.\n", UniqueName)
+		return -1
+	}
+	return sprite.GetSpriteID()
+}
+
 func (s *scratchState) GetSpriteInfo(UniqueName string) models.SpriteState {
-	return s.posBroker.GetSpriteInfo(UniqueName)
+	return s.posBroker.GetSpriteInfo(s.GetSpriteID(UniqueName))
+}
+
+func (s *scratchState) GetSpriteInfoByID(id int) models.SpriteState {
+	return s.posBroker.GetSpriteInfo(id)
 }
 
 func (s *scratchState) GetWidth() int {
@@ -162,6 +206,22 @@ func (sim *scratchState) PlaySound(name string, volume float64) {
 		Volume:    volume,
 	}
 	sim.cmdChan <- cmd
+}
+
+func (sim *scratchState) WhoIsNearMe(x, y, distance float64) []models.NearMeInfo {
+	return sim.posBroker.GetSpritesNearMe(x, y, distance)
+}
+
+func (sim *scratchState) SendMsg(toSpriteID int, msg any) {
+	sim.idToSpriteMapMutex.RLock()
+	toSprite, ok := sim.idToSpriteMap[toSpriteID]
+	sim.idToSpriteMapMutex.RUnlock()
+	if !ok {
+		log.Printf("Could not send msg to %d, doesn't exist.\n", toSpriteID)
+		return
+	}
+
+	toSprite.AddMsg(msg)
 }
 
 // This returns nil if there is no new data.

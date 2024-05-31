@@ -89,7 +89,7 @@ func NewGame(init GameInitStruct) *EbitenGame {
 		g.sprites[i] = make([]*ebitenSprite, 0, 31000)
 	}
 
-	// ebiten.SetTPS(120)
+	ebiten.SetTPS(120)
 	// ebiten.SetVsyncEnabled(false) // For some reason, on Windows, there is quite a bit of lag.
 	// setting this to false clears it up, but also makes it run at 1000Hz...
 	ebiten.SetWindowSize(g.screenWidth, g.screenHeight)
@@ -259,7 +259,7 @@ func (g *EbitenGame) Update() error {
 
 func (g *EbitenGame) Draw(screen *ebiten.Image) {
 	op := ebiten.DrawImageOptions{}
-
+	count := 0
 	for i := range g.sprites {
 		a := g.sprites[i]
 		for j := range a {
@@ -289,12 +289,12 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 			}
 
 			screen.DrawImage(&costume, &op)
-
+			count++
 		}
 	}
 
 	if g.showFPS {
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f", ebiten.ActualFPS(), ebiten.ActualTPS()))
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f, Cnt: %d", ebiten.ActualFPS(), ebiten.ActualTPS(), count))
 	}
 }
 

@@ -28,6 +28,7 @@ type sprite struct {
 	sim models.Scratch
 
 	spriteID     int
+	spriteType   int
 	UniqueName   string
 	constumeName string
 	x, y         float64
@@ -42,6 +43,7 @@ type sprite struct {
 
 	clickBody     models.ClickOnBody
 	userInputChan chan *models.UserInput
+	rcvdMsgs      chan any
 }
 
 var _ models.Sprite = &sprite{}
@@ -55,6 +57,7 @@ func NewSprite(sim models.Scratch, UniqueName string, spriteID int) *sprite {
 		scaleY:     1,
 		sim:        sim,
 		clickBody:  tools.NewTouchCollisionBody(),
+		rcvdMsgs:   make(chan any, 10),
 	}
 	return ret
 }
@@ -80,6 +83,11 @@ func (s *sprite) GetUniqueName() string {
 func (s *sprite) Costume(name string) {
 	s.constumeName = name
 	s.fullUpdate()
+}
+
+func (s *sprite) SetType(newType int) {
+	s.spriteType = newType
+	s.minUpdate()
 }
 
 func (s *sprite) Angle(angleDegrees float64) {
@@ -135,6 +143,7 @@ func (s *sprite) All(in models.SpriteState) {
 		return
 	}
 
+	s.spriteType = in.SpriteType
 	s.constumeName = in.CostumeName
 	s.x = in.X
 	s.y = in.Y
@@ -154,6 +163,7 @@ func (s *sprite) All(in models.SpriteState) {
 func (s *sprite) GetState() models.SpriteState {
 	return models.SpriteState{
 		SpriteID:     s.spriteID,
+		SpriteType:   s.spriteType,
 		UniqueName:   s.UniqueName,
 		CostumeName:  s.constumeName,
 		X:            s.x,
@@ -204,6 +214,34 @@ func (s *sprite) JustPressedUserInput() *models.UserInput {
 	}
 
 	return nil
+}
+
+func (s *sprite) WhoIsNearMe(distance float64) []models.NearMeInfo {
+	return s.sim.WhoIsNearMe(s.x, s.y, distance)
+}
+
+func (s *sprite) SendMsg(toSpriteID int, msg any) {
+	s.sim.SendMsg(toSpriteID, msg)
+}
+
+func (s *sprite) GetMsgs() []any {
+	msgs := []any{}
+
+GetAllRcvdMsgs:
+	for {
+		select {
+		case i := <-s.rcvdMsgs:
+			msgs = append(msgs, i)
+		default:
+			// receiving from chan would block without this
+			break GetAllRcvdMsgs
+		}
+	}
+	return msgs
+}
+
+func (s *sprite) AddMsg(msg any) {
+	s.rcvdMsgs <- msg
 }
 
 func (s *sprite) minUpdate() {

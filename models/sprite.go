@@ -4,6 +4,7 @@ package models
 
 type SpriteState struct {
 	SpriteID       int
+	SpriteType     int
 	UniqueName     string
 	CostumeName    string
 	X, Y           float64
@@ -22,6 +23,7 @@ type Sprite interface {
 
 	// Updates
 	Costume(name string)
+	SetType(newType int)
 	Angle(angleDegrees float64)
 	Pos(cartX, cartY float64) // Cartesian (x,y). Center in the middle of the window
 	Z(int)                    //
@@ -41,6 +43,12 @@ type Sprite interface {
 	// User Input
 	PressedUserInput() *UserInput
 	JustPressedUserInput() *UserInput
+
+	// Interact With other sprites
+	WhoIsNearMe(distance float64) []NearMeInfo
+	SendMsg(toSpriteID int, msg any)
+	GetMsgs() []any
+	AddMsg(msg any)
 
 	// exit
 	DeleteSprite()
