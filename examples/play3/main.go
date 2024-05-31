@@ -6,7 +6,7 @@ import (
 
 	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 func simStartFunc(sim models.Scratch) {
 	// sim.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
 
-	textImage := tools.CreateTextBubble(200, 100, "abasd sdf sdfsdfsd fs dfsdfsd fsdf sf\n    c234", 20)
+	textImage := spritestools.CreateTextBubble(200, 100, "abasd sdf sdfsdfsd fs dfsdfsd fsdf sf\n    c234", 20)
 	sim.AddCostume(textImage, "textBubble")
 
 	a := 0.0
@@ -51,7 +51,7 @@ MainSpriteLoop:
 				break MainSpriteLoop
 			}
 			if i.Keys.N {
-				textImage := tools.CreateTextBubble(200, 100, fmt.Sprintf("angle=%.0f", a), 30)
+				textImage := spritestools.CreateTextBubble(200, 100, fmt.Sprintf("angle=%.0f", a), 30)
 				sim.AddCostume(textImage, "textBubble")
 			}
 		}

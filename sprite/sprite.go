@@ -9,7 +9,7 @@ import (
 	"os"
 
 	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 )
 
 func LoadSpriteFile(path string) (image.Image, error) {
@@ -56,7 +56,7 @@ func NewSprite(sim models.Scratch, uniqueName string, spriteID int) *sprite {
 		scaleX:       1,
 		scaleY:       1,
 		sim:          sim,
-		clickBody:    tools.NewTouchCollisionBody(),
+		clickBody:    spritestools.NewTouchCollisionBody(),
 		receivedMsgs: make(chan any, 10),
 	}
 	return ret

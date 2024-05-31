@@ -11,7 +11,7 @@ import (
 	"github.com/gary23b/sprites/game"
 	"github.com/gary23b/sprites/models"
 	"github.com/gary23b/sprites/sprite"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 )
 
 type scratchState struct {
@@ -20,8 +20,8 @@ type scratchState struct {
 	g       *game.EbitenGame
 	cmdChan chan any
 
-	justPressedBroker *tools.Broker[*models.UserInput]
-	posBroker         *tools.PositionBroker
+	justPressedBroker *spritestools.Broker[*models.UserInput]
+	posBroker         *spritestools.PositionBroker
 
 	idToSpriteMapMutex sync.RWMutex
 	idToSpriteMap      map[int]models.Sprite
@@ -43,8 +43,8 @@ func Start(params ScratchParams, simStartFunc func(models.Scratch)) {
 	ret := &scratchState{
 		width:             params.Width,
 		height:            params.Height,
-		justPressedBroker: tools.NewBroker[*models.UserInput](100),
-		posBroker:         tools.NewPositionBroker(),
+		justPressedBroker: spritestools.NewBroker[*models.UserInput](100),
+		posBroker:         spritestools.NewPositionBroker(),
 		idToSpriteMap:     make(map[int]models.Sprite),
 		nameToSpriteMap:   make(map[string]models.Sprite),
 	}
@@ -104,7 +104,7 @@ func (s *scratchState) DeleteSprite(in models.Sprite) {
 func (s *scratchState) DeleteAllSprites() {
 	update := models.CmdSpritesDeleteAll{}
 	s.cmdChan <- update
-	s.posBroker = tools.NewPositionBroker()
+	s.posBroker = spritestools.NewPositionBroker()
 
 	s.idToSpriteMapMutex.Lock()
 	s.idToSpriteMap = make(map[int]models.Sprite)

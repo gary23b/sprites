@@ -10,7 +10,7 @@ import (
 	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/models"
 	"github.com/gary23b/sprites/sprite"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 )
 
 var SkyBlue color.RGBA = color.RGBA{0x87, 0xCE, 0xEB, 0xFF}
@@ -119,7 +119,7 @@ func RunMouse(sim models.Scratch) {
 }
 
 func ShowGameOver(sim models.Scratch) {
-	imgGameOver := tools.CreateTextImg(fmt.Sprintf("GAME OVER\nSCORE: %d", GameState.Score), 1000, 130, 60, tools.Red)
+	imgGameOver := spritestools.CreateTextImg(fmt.Sprintf("GAME OVER\nSCORE: %d", GameState.Score), 1000, 130, 60, spritestools.Red)
 	sim.AddCostume(imgGameOver, "GameOver")
 	s := sim.AddSprite("GameOver")
 	s.Costume("GameOver")
