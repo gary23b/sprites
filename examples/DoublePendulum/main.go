@@ -9,7 +9,7 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 )
 
 // https://stackoverflow.com/questions/68339204/double-pendulum-rk4
@@ -27,11 +27,11 @@ func simStartFunc(sim models.Scratch) {
 	w2 := 0.0
 	scaleUpBy := 200.0
 
-	sim.AddCostume(createCircle(20, tools.White), "White Circle")
-	sim.AddCostume(createCircle(18, tools.Green), "Green Circle")
-	sim.AddCostume(createCircle(16, tools.Red), "Red Circle")
-	sim.AddCostume(createRectangle(16, scaleUpBy, tools.SkyBlue), "connecting bar 1")
-	sim.AddCostume(createRectangle(12, scaleUpBy, tools.Yellow), "connecting bar 2")
+	sim.AddCostume(createCircle(20, spritestools.White), "White Circle")
+	sim.AddCostume(createCircle(18, spritestools.Green), "Green Circle")
+	sim.AddCostume(createCircle(16, spritestools.Red), "Red Circle")
+	sim.AddCostume(createRectangle(16, scaleUpBy, spritestools.SkyBlue), "connecting bar 1")
+	sim.AddCostume(createRectangle(12, scaleUpBy, spritestools.Yellow), "connecting bar 2")
 
 	pivot := sim.AddSprite("pivot")
 	pivot.Costume("White Circle")

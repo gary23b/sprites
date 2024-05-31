@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -38,7 +38,7 @@ type EbitenGame struct {
 	screenWidth       int
 	screenHeight      int
 	showFPS           bool
-	justPressedBroker *tools.Broker[*models.UserInput]
+	justPressedBroker *spritestools.Broker[*models.UserInput]
 	exitFlag          bool
 
 	controlState        SavedControlState
@@ -65,7 +65,7 @@ type GameInitStruct struct {
 	Width             int
 	Height            int
 	ShowFPS           bool
-	JustPressedBroker *tools.Broker[*models.UserInput]
+	JustPressedBroker *spritestools.Broker[*models.UserInput]
 }
 
 func NewGame(init GameInitStruct) *EbitenGame {

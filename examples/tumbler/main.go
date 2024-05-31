@@ -11,7 +11,7 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 	"github.com/jakecoffman/cp"
 )
 
@@ -104,7 +104,7 @@ func AddContainer(sim models.Scratch, space *cp.Space) *object {
 
 	dc := gg.NewContext(400, 400)
 	dc.DrawRectangle(0, 0, 400, 400)
-	dc.SetColor(tools.Aqua)
+	dc.SetColor(spritestools.Aqua)
 	dc.Stroke()
 	sim.AddCostume(dc.Image(), "container")
 	sprite := sim.AddSprite("container")
@@ -200,7 +200,7 @@ func createCircleImage(radius float64, c color.Color) image.Image {
 	dc.DrawCircle(radius*1.5, radius*1.5, radius)
 	dc.SetColor(c)
 	dc.Fill()
-	dc.SetColor(tools.White)
+	dc.SetColor(spritestools.White)
 	dc.SetLineWidth(3)
 	dc.DrawLine(radius*1.5, radius*1.5, radius*2.0, radius*1.5)
 	dc.Stroke()

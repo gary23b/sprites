@@ -8,7 +8,7 @@ import (
 	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/models"
 	"github.com/gary23b/sprites/sprite"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 )
 
 func main() {
@@ -41,7 +41,7 @@ func simStartFunc(sim models.Scratch) {
 
 func testScene(sim models.Scratch) {
 
-	broker := tools.NewBroker[string](100)
+	broker := spritestools.NewBroker[string](100)
 
 	s := sim.AddSprite("mainTurtle")
 	s.Costume("t1")
@@ -95,7 +95,7 @@ func testScene(sim models.Scratch) {
 	// testScene(sim)
 }
 
-func turtle(sim models.Scratch, broker *tools.Broker[string]) {
+func turtle(sim models.Scratch, broker *spritestools.Broker[string]) {
 	broadcasts := broker.Subscribe()
 	s := sim.AddSprite(fmt.Sprintf("turtle%d%d", rand.Uint64(), rand.Uint64()))
 	s.Costume("t1")

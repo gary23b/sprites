@@ -10,7 +10,7 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/tools"
+	"github.com/gary23b/sprites/spritestools"
 	"github.com/jakecoffman/cp"
 )
 
@@ -90,7 +90,7 @@ func AddMarbleElevator(sim models.Scratch, space *cp.Space) *object {
 
 	dc := gg.NewContext(400, 400)
 	dc.DrawRectangle(0, 0, 400, 400)
-	dc.SetColor(tools.Aqua)
+	dc.SetColor(spritestools.Aqua)
 	dc.Stroke()
 	sim.AddCostume(dc.Image(), "container")
 	sprite := sim.AddSprite("container")

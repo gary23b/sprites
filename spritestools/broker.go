@@ -1,4 +1,4 @@
-package tools
+package spritestools
 
 // initial reference material
 // https://stackoverflow.com/questions/36417199/how-to-broadcast-message-using-channel
