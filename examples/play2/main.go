@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/game"
 	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/sprite"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 }
 
 func simStartFunc(sim models.Scratch) {
-	sim.AddCostume(game.DecodeCodedSprite(game.TurtleImage), "t1")
+	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t1")
 
 	a := 0.0
 	s := sim.AddSprite("mainTurtle")
