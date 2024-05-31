@@ -10,7 +10,7 @@ import (
 )
 
 // Expanded version of gg.Context.DrawRoundedRectangle(...)
-func DrawRoundedRectangleThoughBubble(dc *gg.Context, x, y, w, h, r float64) {
+func DrawRoundedRectangleThoughtBubble(dc *gg.Context, x, y, w, h, r float64) {
 	x0, x1, x2, x3 := x, x+r, x+w-r, x+w
 	y0, y1, y2, y3 := y, y+r, y+h-r, y+h
 	dc.NewSubPath()
@@ -34,7 +34,7 @@ func DrawRoundedRectangleThoughBubble(dc *gg.Context, x, y, w, h, r float64) {
 }
 
 func CreateTextBubble(width, height float64, inputText string, size float64) image.Image {
-	//startTime := time.Now()
+	// startTime := time.Now()
 	font, err := truetype.Parse(goregular.TTF)
 	if err != nil {
 		panic("")
@@ -46,7 +46,7 @@ func CreateTextBubble(width, height float64, inputText string, size float64) ima
 	dc := gg.NewContext(int(width), int(height))
 	dc.SetFontFace(face)
 
-	DrawRoundedRectangleThoughBubble(dc, 3, 3, width-6, height-30, 10)
+	DrawRoundedRectangleThoughtBubble(dc, 3, 3, width-6, height-30, 10)
 	dc.SetColor(White)
 	dc.FillPreserve()
 	dc.SetColor(SkyBlue)
@@ -57,12 +57,12 @@ func CreateTextBubble(width, height float64, inputText string, size float64) ima
 	dc.DrawStringWrapped(inputText, 5, 5, 0.0, 0.0, width-10, 1, gg.AlignCenter)
 	img := dc.Image()
 
-	//fmt.Println(time.Since(startTime).Seconds()) // 1ms
+	// fmt.Println(time.Since(startTime).Seconds()) // 1ms
 	return img
 }
 
 func CreateTextImg(inputText string, width, height, size float64, c color.Color) image.Image {
-	//startTime := time.Now()
+	// startTime := time.Now()
 	font, err := truetype.Parse(goregular.TTF)
 	if err != nil {
 		panic("")
@@ -77,6 +77,6 @@ func CreateTextImg(inputText string, width, height, size float64, c color.Color)
 	dc.DrawStringWrapped(inputText, 0, 0, 0.0, 0.0, width, 1, gg.AlignCenter)
 	img := dc.Image()
 
-	//fmt.Println(time.Since(startTime).Seconds()) // 1ms
+	// fmt.Println(time.Since(startTime).Seconds()) // 1ms
 	return img
 }

@@ -103,14 +103,35 @@ Here is a really simple game where you have to click on each turtle before it re
 go run github.com/gary23b/sprites/examples/fallingturtles@latest
 ```
 
-## Build Executable for Window
+## Build Executable
+
+To get the list of go build targets use the following command:
 
 ```bash
-GOOS=windows go build ./examples/fallingturtles/
+go tool dist list
+```
+
+### Window
+
+```bash
+GOOS=windows GOARCH=amd64 go build ./examples/fallingturtles/
+```
+
+### Linux
+
+```bash
+GOOS=linux  GOARCH=amd64 go build ./examples/fallingturtles/
+```
+
+### WASM
+
+```bash
+GOOS=js  GOARCH=wasm go build ./examples/fallingturtles/
 ```
 
 ## Things to Research
 
+* https://jakecoffman.com/cp-ebiten/
 * https://github.com/jakecoffman/cp
 * https://github.com/jakecoffman/cp-examples
 * https://github.com/jakecoffman/cp-ebiten

@@ -48,10 +48,10 @@ type sprite struct {
 
 var _ models.Sprite = &sprite{}
 
-func NewSprite(sim models.Scratch, UniqueName string, spriteID int) *sprite {
+func NewSprite(sim models.Scratch, uniqueName string, spriteID int) *sprite {
 	ret := &sprite{
 		spriteID:     spriteID,
-		UniqueName:   UniqueName,
+		UniqueName:   uniqueName,
 		opacity:      100,
 		scaleX:       1,
 		scaleY:       1,
@@ -62,8 +62,8 @@ func NewSprite(sim models.Scratch, UniqueName string, spriteID int) *sprite {
 	return ret
 }
 
-func (s *sprite) Clone(UniqueName string) models.Sprite {
-	sClone := s.sim.AddSprite(UniqueName)
+func (s *sprite) Clone(uniqueName string) models.Sprite {
+	sClone := s.sim.AddSprite(uniqueName)
 	sClone.All(s.GetState())
 	if s.clickBody != nil {
 		sClone.ReplaceClickBody(s.clickBody.Clone())

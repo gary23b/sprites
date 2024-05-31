@@ -77,20 +77,19 @@ func (s *ClickOnBody) Pos(x, y float64) {
 	s.y = y
 }
 
-func (s *ClickOnBody) Angle(RadAngle float64) {
-	s.radAngle = RadAngle
+func (s *ClickOnBody) Angle(radAngle float64) {
+	s.radAngle = radAngle
 }
 
 func (s *ClickOnBody) IsMouseClickInBody(x, y float64) bool {
 	// get the mouse position relative to the origin centered body
-	x = x - s.x
-	y = y - s.y
+	x -= s.x
+	y -= s.y
 
 	// Check if I care
 	distanceSquared := x*x + y*y
 	if distanceSquared >= s.radiusOfCaring*s.radiusOfCaring {
 		return false
-
 	}
 
 	// Rotate the mouse around the origin based on the body angle
@@ -125,8 +124,8 @@ func (s *ClickOnBody) IsMouseClickInBody(x, y float64) bool {
 
 func (s *ClickOnBody) GetMousePosRelativeToOriginalSprite(x, y float64) (float64, float64) {
 	// get the mouse position relative to the origin centered body
-	x = x - s.x
-	y = y - s.y
+	x -= s.x
+	y -= s.y
 
 	// Rotate the mouse around the origin based on the body angle
 	if s.radAngle != 0 {

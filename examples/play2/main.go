@@ -60,7 +60,7 @@ func t2(sim models.Scratch) {
 	s.Z(0)
 	s.Visible(true)
 	cb := s.GetClickBody()
-	cb.AddCirleBody(0, 0, 32)
+	cb.AddCircleBody(0, 0, 32)
 
 	justPressedChan := sim.SubscribeToJustPressedUserInput()
 

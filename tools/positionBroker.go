@@ -123,7 +123,6 @@ func (s *PositionBroker) UpdateSpriteInfo(id int, state models.SpriteState) {
 	g.mutex.Unlock()
 
 	item.state = state
-
 }
 
 func (s *PositionBroker) GetSpriteInfo(id int) models.SpriteState {

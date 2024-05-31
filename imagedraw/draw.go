@@ -15,7 +15,7 @@ type canvas struct {
 	penSize float64
 	c       color.RGBA
 	x, y    float64
-	angle   float64 //radians
+	angle   float64 // radians
 	penOn   bool
 }
 

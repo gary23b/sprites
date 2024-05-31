@@ -42,7 +42,7 @@ func simStartFunc(sim models.Scratch) {
 	s.Angle(-90)
 
 	s.Pos(0, 0)
-	b.AddCirleBody(0, 0, 32)
+	b.AddCircleBody(0, 0, 32)
 	s.Z(1)
 	// s.Visible(true)
 

@@ -65,10 +65,10 @@ func (s *scratchState) Exit() {
 	s.g.TellGameToExit()
 }
 
-func (s *scratchState) AddSprite(UniqueName string) models.Sprite {
+func (s *scratchState) AddSprite(uniqueName string) models.Sprite {
 	spriteID := s.g.GetNextSpriteID()
-	if UniqueName == "" {
-		UniqueName = fmt.Sprintf("rand%X%X", rand.Uint64(), rand.Uint64())
+	if uniqueName == "" {
+		uniqueName = fmt.Sprintf("rand%X%X", rand.Uint64(), rand.Uint64())
 	}
 	update := models.CmdAddNewSprite{
 		SpriteID: spriteID,
@@ -76,11 +76,11 @@ func (s *scratchState) AddSprite(UniqueName string) models.Sprite {
 	s.cmdChan <- update
 
 	s.posBroker.AddSprite(spriteID)
-	ret := sprite.NewSprite(s, UniqueName, spriteID)
+	ret := sprite.NewSprite(s, uniqueName, spriteID)
 
 	s.idToSpriteMapMutex.Lock()
 	s.idToSpriteMap[spriteID] = ret
-	s.nameToSpriteMap[UniqueName] = ret
+	s.nameToSpriteMap[uniqueName] = ret
 	s.idToSpriteMapMutex.Unlock()
 
 	s.posBroker.UpdateSpriteInfo(spriteID, ret.GetState())
@@ -144,19 +144,19 @@ func (s *scratchState) SpriteUpdateFull(in models.Sprite) {
 	s.cmdChan <- cmd
 }
 
-func (s *scratchState) GetSpriteID(UniqueName string) int {
+func (s *scratchState) GetSpriteID(uniqueName string) int {
 	s.idToSpriteMapMutex.RLock()
-	sprite, ok := s.nameToSpriteMap[UniqueName]
+	sprite, ok := s.nameToSpriteMap[uniqueName]
 	s.idToSpriteMapMutex.RUnlock()
 	if !ok {
-		log.Printf("%s, doesn't exist.\n", UniqueName)
+		log.Printf("%s, doesn't exist.\n", uniqueName)
 		return -1
 	}
 	return sprite.GetSpriteID()
 }
 
-func (s *scratchState) GetSpriteInfo(UniqueName string) models.SpriteState {
-	return s.posBroker.GetSpriteInfo(s.GetSpriteID(UniqueName))
+func (s *scratchState) GetSpriteInfo(uniqueName string) models.SpriteState {
+	return s.posBroker.GetSpriteInfo(s.GetSpriteID(uniqueName))
 }
 
 func (s *scratchState) GetSpriteInfoByID(id int) models.SpriteState {
