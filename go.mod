@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.6.2
-	golang.org/x/image v0.12.0
+	golang.org/x/image v0.13.0
 )
 
 require (

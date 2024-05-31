@@ -1,4 +1,4 @@
-package tools
+package game
 
 import (
 	"image"
@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/gary23b/sprites/imagedraw"
+	"github.com/gary23b/sprites/tools"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -15,10 +16,10 @@ import (
 
 func MakeTextBubbleShape(w, h float64) image.Image {
 	i := imagedraw.NewImageDraw(int(w), int(h))
-	i.Color(White)
+	i.Color(tools.White)
 	//i.CircleAroundPoint(0, 0, 10, 0, 360, 20)
 	i.FakeEllipseAroundPoint(0, 0, w*0.4, h*0.4, 0, 100)
-	i.BucketFillPoint(0, 0, Water)
+	i.BucketFillPoint(0, 0, tools.Water)
 
 	return i.GetImage()
 }
