@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/gary23b/sprites)](https://goreportcard.com/report/github.com/gary23b/sprites)
 [![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/gary23b/fc54fb0b86a835ca3f907efc85a1d61c/raw/gary23b_sprites_main.json)](https://github.com/gary23b/sprites/actions)
 
-## Go Sprites is for simulating actor model sprites in a 2D world 
+## Go Sprites is for simulating actor model sprites in a 2D world
 
 Golang Sprites is a reimagining of [Scratch](https://scratch.mit.edu/) created by MIT Media Lab. Every entity on the screen is a sprite that can be programmed independently.
 
@@ -19,7 +19,7 @@ The goals are many:
 
 ## Install
 
-Go 1.21 or later is required.
+Go 1.22 or later is required.
 
 Ebitengine is the main dependency. [Check here for the system specific instructions](https://ebitengine.org/en/documents/install.html).
 
