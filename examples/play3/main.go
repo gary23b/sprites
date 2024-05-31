@@ -4,23 +4,19 @@ import (
 	"time"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/game"
 	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/tools"
 )
 
 func main() {
-	params := sprites.ScratchParams{
-		Width:   1000,
-		Height:  1000,
-		ShowFPS: true,
-	}
+	params := sprites.ScratchParams{Width: 1000, Height: 1000, ShowFPS: true}
 	sprites.Start(params, simStartFunc)
 }
 
 func simStartFunc(sim models.Scratch) {
 	// sim.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
 
-	textImage := game.CreateTextBubble("abasdfasdfadsfasdfadsf\nc234", 16)
+	textImage := tools.CreateTextBubble(200, 100, "abasd sdf sdfsdfsd fs dfsdfsd fsdf sf\n    c234", 20)
 	sim.AddCostume(textImage, "t1")
 
 	a := 0.0
@@ -42,16 +38,17 @@ func simStartFunc(sim models.Scratch) {
 MainSpriteLoop:
 	for {
 		i := sprites.GetNewestJustPressedFromChan(justPressedChan)
-		if i.Mouse.Left {
-			if b.IsMouseClickInBody(float64(i.Mouse.MouseX), float64(i.Mouse.MouseY)) {
-				a += 10
-				s.Angle(a)
-				s.Pos(a, 0)
+		if i != nil {
+			if i.Mouse.Left {
+				if b.IsMouseClickInBody(float64(i.Mouse.MouseX), float64(i.Mouse.MouseY)) {
+					a += 10
+					s.Angle(a)
+					s.Pos(a, 0)
+				}
 			}
-
-		}
-		if i.Mouse.Right {
-			break MainSpriteLoop
+			if i.Mouse.Right {
+				break MainSpriteLoop
+			}
 		}
 		time.Sleep(time.Millisecond * 10)
 	}

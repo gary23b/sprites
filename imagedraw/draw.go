@@ -33,7 +33,7 @@ func NewImageDraw(width, height int) *canvas {
 	return ret
 }
 
-func (s *canvas) GetImage() image.Image {
+func (s *canvas) GetImage() *image.RGBA {
 	return s.i
 }
 

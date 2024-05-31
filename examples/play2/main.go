@@ -32,8 +32,8 @@ MainSpriteLoop:
 		inputPressed := s.PressedUserInput()
 		s.Pos(float64(inputPressed.Mouse.MouseX), float64(inputPressed.Mouse.MouseY))
 
-		select {
-		case i := <-justPressedChan:
+		i := sprites.GetNewestJustPressedFromChan(justPressedChan)
+		if i != nil {
 			// use i
 			if i.Mouse.Left {
 				a += 10
@@ -42,8 +42,6 @@ MainSpriteLoop:
 			if i.Mouse.Right {
 				break MainSpriteLoop
 			}
-		default:
-			// receiving from chan would block
 		}
 		time.Sleep(time.Millisecond * 10)
 	}
