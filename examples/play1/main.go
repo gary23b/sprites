@@ -8,6 +8,7 @@ import (
 
 	"github.com/gary23b/sprites/ebitensim"
 	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/tools"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 }
 
 func fileExists(path string) bool {
-	_, err := os.Stat("/path/to/whatever")
+	_, err := os.Stat(path)
 	return !errors.Is(err, os.ErrNotExist)
 }
 
@@ -37,12 +38,14 @@ func simStartFunc(sim models.Sim) {
 		sim.AddSound("./examples/play1/ragtime.mp3", "ragtime")
 	}
 
-	sim.PlaySound("ragtime", .1)
+	// sim.PlaySound("ragtime", .1)
 
 	testScene(sim)
 }
 
 func testScene(sim models.Sim) {
+
+	broker := tools.NewBroker[string]()
 
 	s := sim.AddSprite()
 	s.Costume("t1")
@@ -71,10 +74,10 @@ func testScene(sim models.Sim) {
 	// time.Sleep(time.Millisecond * 200)
 	// sim.PlaySound("jab", 1)
 	for i := 0; i < 30000; i++ {
-		go turtle(sim)
+		go turtle(sim, broker)
 	}
 
-	time.Sleep(time.Second * 6)
+	time.Sleep(time.Second * 10)
 	s.XYScale(-10, 10)
 
 	time.Sleep(time.Millisecond * 500)
@@ -83,14 +86,21 @@ func testScene(sim models.Sim) {
 	s.Opacity(30)
 	// s.Angle(45)
 
+	sim.PlaySound("jump", .6)
+	broker.Publish("delete all")
+
 	time.Sleep(time.Second * 10)
 	sim.DeleteAllSprites()
+	sim.PlaySound("jab", .5)
 	time.Sleep(time.Millisecond * 20)
 
-	testScene(sim)
+	broker.Stop()
+
+	// testScene(sim)
 }
 
-func turtle(sim models.Sim) {
+func turtle(sim models.Sim, broker *tools.Broker[string]) {
+	broadcasts := broker.Subscribe()
 	s := sim.AddSprite()
 	s.Costume("t1")
 	s.Scale(.2)
@@ -110,6 +120,11 @@ func turtle(sim models.Sim) {
 
 	}
 
-	//time.Sleep(time.Millisecond * time.Duration(rand.Float64()*10000))
-	//s.DeleteSprite()
+	// wait for msg
+	<-broadcasts
+
+	broker.Unsubscribe(broadcasts)
+
+	time.Sleep(time.Millisecond * time.Duration(rand.Float64()*3000))
+	s.DeleteSprite()
 }
