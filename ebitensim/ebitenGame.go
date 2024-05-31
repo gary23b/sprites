@@ -24,11 +24,9 @@ type ebitenSprite struct {
 	spriteImage    []*ebiten.Image
 	spriteImageMap map[string]int
 	CostumeIndex   int
-	width          float64
-	height         float64
 
 	x, y           float64
-	angle          float64
+	angleRad       float64
 	visible        bool
 	xScale, yScale float64
 	opacity        float64
@@ -143,17 +141,9 @@ func (g *EbitenGame) addSpriteCostume(spriteIndex int, img image.Image, costumeN
 		fmt.Println("creating a new sprite")
 	}
 
-	bounds := img.Bounds()
-	width := bounds.Max.X
-	height := bounds.Max.Y
-
 	s.spriteImage = append(s.spriteImage, spriteImage)
 	s.spriteImageMap[costumeName] = len(s.spriteImage) - 1
 
-	if len(s.spriteImage) == 1 {
-		s.width = float64(width)
-		s.height = float64(height)
-	}
 	return len(s.spriteImage) - 1
 }
 
@@ -219,7 +209,7 @@ EatSpritesCmdLoop:
 				s.CostumeIndex = costumeID
 				s.x = v.X
 				s.y = v.Y
-				s.angle = v.Angle
+				s.angleRad = v.Angle
 				s.visible = v.Visible
 				s.xScale = v.XScale
 				s.yScale = v.YScale
@@ -278,9 +268,12 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 			}
 			op.GeoM.Reset()
 			op.ColorScale.Reset()
-			op.GeoM.Translate(-sprite.width/2, -sprite.height/2) // Move the center to (0,0) so that we can rotate around the center.
-			op.GeoM.Rotate(-sprite.angle)                        // This command rotates clockwise for some reason.
+			costume := sprite.spriteImage[sprite.CostumeIndex]
+			w, h := costume.Bounds().Dx(), costume.Bounds().Dy()
+			op.GeoM.Translate(-float64(w)/2, -float64(h)/2) // Move the center to (0,0) so that we can rotate around the center.
 			op.GeoM.Scale(sprite.xScale, sprite.yScale)
+			op.GeoM.Rotate(-sprite.angleRad) // This command rotates clockwise for some reason.
+
 			op.GeoM.Translate(float64(g.screenWidth/2), float64(g.screenHeight/2)) // (0,0) is in the center for Cartesian cordinates
 			op.GeoM.Translate(sprite.x, -sprite.y)
 
@@ -288,7 +281,7 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 				op.ColorScale.SetA(float32(sprite.opacity) / 100)
 			}
 
-			screen.DrawImage(sprite.spriteImage[sprite.CostumeIndex], &op)
+			screen.DrawImage(costume, &op)
 
 		}
 	}

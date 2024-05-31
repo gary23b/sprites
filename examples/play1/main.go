@@ -9,7 +9,12 @@ import (
 )
 
 func main() {
-	ebitensim.StartSim(ebitensim.SimParams{Width: 1000, Height: 1000, ShowFPS: true}, simStartFunc)
+	params := ebitensim.SimParams{
+		Width:   1000,
+		Height:  1000,
+		ShowFPS: true,
+	}
+	ebitensim.StartSim(params, simStartFunc)
 }
 
 func simStartFunc(sim models.Sim) {
@@ -26,7 +31,14 @@ func simStartFunc(sim models.Sim) {
 	}
 
 	time.Sleep(time.Second * 6)
+	s.XYScale(-10, 10)
+
+	time.Sleep(time.Millisecond * 500)
+
 	s.Z(2)
+	s.Opacity(30)
+	// s.Angle(45)
+
 }
 
 func turtle(sim models.Sim) {
@@ -51,5 +63,5 @@ func turtle(sim models.Sim) {
 	}
 
 	time.Sleep(time.Millisecond * time.Duration(rand.Float64()*10000))
-	s.DeleteSprite()
+	//s.DeleteSprite()
 }

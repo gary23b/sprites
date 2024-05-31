@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"math"
 	"os"
 
 	"github.com/gary23b/sprites/models"
@@ -27,15 +28,13 @@ type sprite struct {
 
 	spriteID     int
 	constumeName string
-	// width   int
-	// height  int
-	x, y    float64
-	z       int
-	angle   float64
-	visible bool
-	opacity float64
-	scaleX  float64
-	scaleY  float64
+	x, y         float64
+	z            int
+	angleRad     float64
+	visible      bool
+	opacity      float64
+	scaleX       float64
+	scaleY       float64
 
 	deleted bool
 
@@ -89,8 +88,8 @@ func (s *sprite) Costume(name string) {
 	s.minUpdate()
 }
 
-func (s *sprite) Angle(radianAngle float64) {
-	s.angle = radianAngle
+func (s *sprite) Angle(angleDegrees float64) {
+	s.angleRad = angleDegrees * (math.Pi / 180.0)
 	s.fullUpdate()
 }
 
@@ -101,6 +100,11 @@ func (s *sprite) Pos(cartX, cartY float64) {
 }
 
 func (s *sprite) Z(z int) {
+	if z < 0 || z > 9 {
+		log.Println("Z must be from 0 to 9")
+		return
+	}
+
 	s.z = z
 	s.fullUpdate()
 }
@@ -128,11 +132,16 @@ func (s *sprite) Opacity(opacityPercent float64) {
 }
 
 func (s *sprite) All(in models.SpriteState) {
+	if in.Z < 0 || in.Z > 9 {
+		log.Println("Z must be from 0 to 9")
+		return
+	}
+
 	s.constumeName = in.CostumeName
 	s.x = in.X
 	s.y = in.Y
 	s.z = in.Z
-	s.angle = in.Angle
+	s.angleRad = in.Angle
 	s.visible = in.Visible
 	s.opacity = in.Opacity
 	s.scaleX = in.ScaleX
@@ -147,7 +156,7 @@ func (s *sprite) GetState() models.SpriteState {
 		X:           s.x,
 		Y:           s.y,
 		Z:           s.z,
-		Angle:       s.angle,
+		Angle:       s.angleRad,
 		Visible:     s.visible,
 		ScaleX:      s.scaleX,
 		ScaleY:      s.scaleY,
@@ -234,7 +243,7 @@ func (s *sprite) fullUpdate() {
 		X:           s.x,
 		Y:           s.y,
 		Z:           s.z,
-		Angle:       s.angle,
+		Angle:       s.angleRad,
 		Visible:     s.visible,
 		XScale:      s.scaleX,
 		YScale:      s.scaleY,
