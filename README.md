@@ -48,7 +48,7 @@ import (
 )
 
 func main() {
-	params := sprites.ScratchParams{Width: 1000, Height: 1000}
+	params := sprites.ScratchParams{Width: 500, Height: 500}
 	sprites.Start(params, simStartFunc)
 }
 
@@ -85,6 +85,8 @@ func turtleRandomWalk(sim models.Scratch) {
 }
 ```
 
+![Golang Sprites simulation of turtle source random walk](https://github.com/gary23b/sprites/blob/main/examples/randomwalk/randomwalk.gif)
+
 ### Double Pendulum
 
 Here is a simulation of a double pendulum.
@@ -93,15 +95,27 @@ Here is a simulation of a double pendulum.
 go run github.com/gary23b/sprites/examples/DoublePendulum@latest
 ```
 
-![Example Picture](https://github.com/gary23b/sprites/blob/main/examples/DoublePendulum/DoublePendulum.gif)
+![Golang Sprites simulation of a double pendulum](https://github.com/gary23b/sprites/blob/main/examples/DoublePendulum/DoublePendulum.gif)
 
 ### Falling Turtles
 
-Here is a really simple game where you have to click on each turtle before it reaches the bottom of the screen. At the end, your final score is displayed.
+This example is a really simple game where you have to click on each turtle before it reaches the bottom of the screen. At the end, your final score is displayed.
 
 ```bash
 go run github.com/gary23b/sprites/examples/fallingturtles@latest
 ```
+
+### Tumbler
+
+Here is a simulation of a rotating box filled with circles, boxes, and rounded rectangles. This uses the library github.com/jakecoffman/cp for the physics simulation. The sprites are being drawn using Golang Scratch.
+
+This is a recreation of https://jakecoffman.com/cp-ebiten/tumble/ except without drawing the shapes using ebiten and cp directly. Here, cp is only performing the physics updates. The original code can be found [here](https://github.com/jakecoffman/cp-examples/blob/master/tumble/tumble.go)
+
+```bash
+go run github.com/gary23b/sprites/examples/tumbler@latest
+```
+
+![Golang Sprites simulation of a rotating box filled with circles, boxes, and rounded rectangles](https://github.com/gary23b/sprites/blob/main/examples/tumbler/tumbler.gif)
 
 ## Build Executable
 

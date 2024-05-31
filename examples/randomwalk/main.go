@@ -11,12 +11,15 @@ import (
 )
 
 func main() {
-	params := sprites.ScratchParams{Width: 1000, Height: 1000}
+	params := sprites.ScratchParams{Width: 500, Height: 500}
 	sprites.Start(params, simStartFunc)
 }
 
 func simStartFunc(sim models.Scratch) {
 	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t")
+
+	// go scratch.CreateGifDithered(sim, time.Millisecond*100, time.Millisecond*100, "./examples/randomwalk/randomwalk.gif", 100)
+
 	for {
 		go turtleRandomWalk(sim)
 		time.Sleep(time.Millisecond * 500)

@@ -224,6 +224,19 @@ func (sim *scratchState) SendMsg(toSpriteID int, msg any) {
 	toSprite.AddMsg(msg)
 }
 
+func (sim *scratchState) GetScreenshot() image.Image {
+	screenshotChan := make(chan image.Image)
+
+	cmd := models.CmdGetScreenshot{
+		ImageChan: screenshotChan,
+	}
+	sim.cmdChan <- cmd
+
+	// Now wait for the screenshot to arrive.
+	screenshot := <-screenshotChan
+	return screenshot
+}
+
 // This returns nil if there is no new data.
 // This will throw away all but the newest set of data available. So this should be called faster that the game update rate (60Hz),
 // otherwise sim.PressedUserInput() should be used instead.

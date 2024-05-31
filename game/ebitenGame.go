@@ -57,6 +57,8 @@ type EbitenGame struct {
 	// Sounds:
 	audioContext *audio.Context
 	sounds       map[string][]byte
+
+	screenShotRequests []chan image.Image
 }
 
 type GameInitStruct struct {
@@ -221,6 +223,9 @@ EatSpritesCmdLoop:
 			case models.CmdPlaySound:
 				g.playSound(v.SoundName, v.Volume)
 
+			case models.CmdGetScreenshot:
+				g.screenShotRequests = append(g.screenShotRequests, v.ImageChan)
+
 			default:
 				log.Printf("I don't know about type %T!\n", v)
 			}
@@ -295,6 +300,15 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 
 	if g.showFPS {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f, Cnt: %d", ebiten.ActualFPS(), ebiten.ActualTPS(), count))
+	}
+
+	if len(g.screenShotRequests) > 0 {
+		screenshot := image.NewRGBA(screen.Bounds())
+		screen.ReadPixels(screenshot.Pix)
+		for i := range g.screenShotRequests {
+			g.screenShotRequests[i] <- screenshot
+		}
+		g.screenShotRequests = []chan image.Image{}
 	}
 }
 

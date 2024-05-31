@@ -50,3 +50,7 @@ type CmdPlaySound struct {
 	SoundName string
 	Volume    float64 // between 0 and 1.
 }
+
+type CmdGetScreenshot struct {
+	ImageChan chan image.Image
+}

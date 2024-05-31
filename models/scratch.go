@@ -36,5 +36,7 @@ type Scratch interface {
 	WhoIsNearMe(x, y, distance float64) []NearMeInfo
 	SendMsg(toSpriteID int, msg any)
 
+	GetScreenshot() image.Image
+
 	Exit()
 }

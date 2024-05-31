@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
-	scratch "github.com/gary23b/sprites"
+	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/models"
 	"github.com/gary23b/sprites/tools"
 	"github.com/jakecoffman/cp"
@@ -17,8 +17,8 @@ import (
 
 // https://github.com/jakecoffman/cp-ebiten/tree/gh-pages
 func main() {
-	params := scratch.ScratchParams{Width: 1000, Height: 1000, ShowFPS: true}
-	scratch.Start(params, simStartFunc)
+	params := sprites.ScratchParams{Width: 600, Height: 600, ShowFPS: true}
+	sprites.Start(params, simStartFunc)
 }
 
 type object struct {
@@ -64,6 +64,8 @@ func simStartFunc(sim models.Scratch) {
 			}
 		}
 	}
+
+	// go scratch.CreateGif(sim, time.Millisecond*100, time.Millisecond*100, "./examples/tumbler/tumbler.gif", 100)
 
 	// Run the processing loop forever.
 	for {
