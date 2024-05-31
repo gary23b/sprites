@@ -9,12 +9,12 @@ type Sim interface {
 	GetHeight() int
 
 	AddCostume(img image.Image, name string)
-	AddSprite() Sprite
+	AddSprite(UniqueName string) Sprite
 	DeleteSprite(Sprite)
 	DeleteAllSprites()
 
-	SpriteMinUpdate(in *CmdSpriteUpdateMin)
-	SpriteFullUpdate(in *CmdSpriteUpdateFull)
+	SpriteUpdatePosAngle(in Sprite)
+	SpriteUpdateFull(in Sprite)
 
 	AddSound(path, name string)
 	PlaySound(name string, volume float64) // volume must be between 0 and 1.
@@ -22,6 +22,8 @@ type Sim interface {
 	PressedUserInput() *UserInput
 	SubscribeToJustPressedUserInput() chan *UserInput
 	UnSubscribeToJustPressedUserInput(in chan *UserInput)
+
+	GetSpriteInfo(UniqueName string) SpriteState
 
 	Exit()
 }

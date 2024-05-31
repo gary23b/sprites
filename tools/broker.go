@@ -1,5 +1,6 @@
 package tools
 
+// A data broker that can be published to, and eny entity that has subscribed will get a copy of the message.
 // https://stackoverflow.com/questions/36417199/how-to-broadcast-message-using-channel
 // https://stackoverflow.com/a/49877632
 type Broker[T any] struct {

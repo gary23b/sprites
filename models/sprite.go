@@ -3,6 +3,8 @@ package models
 ///////////////////////
 
 type SpriteState struct {
+	SpriteID       int
+	UniqueName     string
 	CostumeName    string
 	X, Y           float64
 	Z              int // Effetively the layer index. 0 through 9 with 9 being the top.
@@ -10,10 +12,12 @@ type SpriteState struct {
 	Visible        bool
 	ScaleX, ScaleY float64
 	Opacity        float64
+	Deleted        bool
 }
 
 type Sprite interface {
 	GetSpriteID() int
+	GetUniqueName() string
 
 	// Updates
 	Costume(name string)

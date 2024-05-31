@@ -3,6 +3,7 @@ package ebitensim
 import (
 	"image"
 	"log"
+	"math"
 
 	"github.com/gary23b/sprites/models"
 	"github.com/gary23b/sprites/tools"
@@ -15,6 +16,7 @@ type simStruct struct {
 	cmdChan chan any
 
 	justPressedBroker *tools.Broker[*models.UserInput]
+	posBroker         *positionBroker
 }
 
 var _ models.Sim = &simStruct{} // Force the linter to tell us if the interface is implemented
@@ -33,6 +35,7 @@ func StartSim(params SimParams, simStartFunc func(models.Sim)) {
 		width:             params.Width,
 		height:            params.Height,
 		justPressedBroker: tools.NewBroker[*models.UserInput](),
+		posBroker:         newPositionBroker(),
 	}
 
 	gameInit := GameInitStruct{
@@ -51,20 +54,23 @@ func (s *simStruct) Exit() {
 	s.g.exitFlag = true
 }
 
-func (s *simStruct) AddSprite() models.Sprite {
+func (s *simStruct) AddSprite(UniqueName string) models.Sprite {
 	spriteID := s.g.GetNextSpriteID()
 	update := models.CmdAddNewSprite{
 		SpriteID: spriteID,
 	}
 	s.cmdChan <- update
 
-	ret := newSprite(s, spriteID)
+	s.posBroker.addSprite(UniqueName)
+	ret := newSprite(s, UniqueName, spriteID)
+	s.posBroker.updateSpriteInfo(UniqueName, ret.GetState())
 	return ret
 }
 
 func (s *simStruct) DeleteSprite(in models.Sprite) {
+	s.posBroker.removeSprite(in.GetUniqueName())
 	update := models.CmdSpriteDelete{
-		SpriteIndex: in.GetSpriteID(),
+		SpriteID: in.GetSpriteID(),
 	}
 	s.cmdChan <- update
 }
@@ -72,14 +78,43 @@ func (s *simStruct) DeleteSprite(in models.Sprite) {
 func (s *simStruct) DeleteAllSprites() {
 	update := models.CmdSpritesDeleteAll{}
 	s.cmdChan <- update
+	s.posBroker = newPositionBroker()
 }
 
-func (s *simStruct) SpriteMinUpdate(in *models.CmdSpriteUpdateMin) {
-	s.cmdChan <- *in
+func (s *simStruct) SpriteUpdatePosAngle(in models.Sprite) {
+	status := in.GetState()
+	s.posBroker.updateSpriteInfo(status.UniqueName, status)
+	cmd := models.CmdSpriteUpdateMin{
+		SpriteID: status.SpriteID,
+		X:        status.X,
+		Y:        status.Y,
+		AngleRad: status.AngleDegrees * (math.Pi / 180.0),
+	}
+
+	s.cmdChan <- cmd
 }
 
-func (s *simStruct) SpriteFullUpdate(in *models.CmdSpriteUpdateFull) {
-	s.cmdChan <- *in
+func (s *simStruct) SpriteUpdateFull(in models.Sprite) {
+	status := in.GetState()
+	s.posBroker.updateSpriteInfo(status.UniqueName, status)
+	cmd := models.CmdSpriteUpdateFull{
+		SpriteID:    status.SpriteID,
+		CostumeName: status.CostumeName,
+		X:           status.X,
+		Y:           status.Y,
+		Z:           status.Z,
+		Angle:       status.AngleDegrees * (math.Pi / 180.0),
+		Visible:     status.Visible,
+		XScale:      status.ScaleX,
+		YScale:      status.ScaleY,
+		Opacity:     status.Opacity,
+	}
+
+	s.cmdChan <- cmd
+}
+
+func (s *simStruct) GetSpriteInfo(UniqueName string) models.SpriteState {
+	return s.posBroker.getSpriteInfo(UniqueName)
 }
 
 func (s *simStruct) GetWidth() int {

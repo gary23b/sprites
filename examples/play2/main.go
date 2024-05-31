@@ -21,13 +21,15 @@ func simStartFunc(sim models.Sim) {
 
 	a := 0.0
 
-	s := sim.AddSprite()
+	s := sim.AddSprite("mainTurtle")
 	s.Costume("t1")
 	s.Scale(10)
 	s.Z(0)
 	s.Visible(true)
 
 	justPressedChan := sim.SubscribeToJustPressedUserInput()
+
+	go t2(sim)
 
 MainSpriteLoop:
 	for {
@@ -53,4 +55,20 @@ MainSpriteLoop:
 	sim.UnSubscribeToJustPressedUserInput(justPressedChan)
 	s.DeleteSprite()
 	sim.Exit()
+}
+
+func t2(sim models.Sim) {
+	s := sim.AddSprite("t2")
+	s.Costume("t1")
+	s.Scale(1)
+	s.Z(0)
+	s.Visible(true)
+
+	// MainSpriteLoop:
+	for {
+		t1Info := sim.GetSpriteInfo("mainTurtle")
+		s.Pos(t1Info.X-500, t1Info.Y)
+
+		time.Sleep(time.Millisecond * 10)
+	}
 }

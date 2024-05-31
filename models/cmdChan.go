@@ -9,14 +9,14 @@ type CmdAddNewSprite struct {
 }
 
 type CmdSpriteUpdateMin struct {
-	SpriteIndex int
-	CostumeName string
-	X           float64
-	Y           float64
+	SpriteID int
+	X        float64
+	Y        float64
+	AngleRad float64
 }
 
 type CmdSpriteUpdateFull struct {
-	SpriteIndex int
+	SpriteID    int
 	CostumeName string
 	X           float64
 	Y           float64
@@ -29,11 +29,11 @@ type CmdSpriteUpdateFull struct {
 }
 
 type CmdSpriteDelete struct {
-	SpriteIndex int
+	SpriteID int
 }
 
 type CmdSpritesDeleteAll struct {
-	SpriteIndex int
+	SpriteID int
 }
 
 type CmdAddCostume struct {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"os"
 	"time"
@@ -47,7 +48,7 @@ func testScene(sim models.Sim) {
 
 	broker := tools.NewBroker[string]()
 
-	s := sim.AddSprite()
+	s := sim.AddSprite("mainTurtle")
 	s.Costume("t1")
 	s.Scale(10)
 	s.Z(0)
@@ -80,7 +81,7 @@ func testScene(sim models.Sim) {
 	time.Sleep(time.Second * 10)
 	s.XYScale(-10, 10)
 
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Millisecond * 5000)
 
 	s.Z(2)
 	s.Opacity(30)
@@ -101,7 +102,7 @@ func testScene(sim models.Sim) {
 
 func turtle(sim models.Sim, broker *tools.Broker[string]) {
 	broadcasts := broker.Subscribe()
-	s := sim.AddSprite()
+	s := sim.AddSprite(fmt.Sprintf("turtle%d%d", rand.Uint64(), rand.Uint64()))
 	s.Costume("t1")
 	s.Scale(.2)
 	s.Z(1)

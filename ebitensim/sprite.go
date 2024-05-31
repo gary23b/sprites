@@ -28,6 +28,7 @@ type sprite struct {
 	sim models.Sim
 
 	spriteID     int
+	UniqueName   string
 	constumeName string
 	x, y         float64
 	z            int
@@ -47,9 +48,10 @@ type sprite struct {
 
 var _ models.Sprite = &sprite{}
 
-func newSprite(sim models.Sim, spriteID int) *sprite {
+func newSprite(sim models.Sim, UniqueName string, spriteID int) *sprite {
 	ret := &sprite{
 		spriteID:   spriteID,
+		UniqueName: UniqueName,
 		opacity:    100,
 		scaleX:     1,
 		scaleY:     1,
@@ -64,15 +66,19 @@ func (s *sprite) GetSpriteID() int {
 	return s.spriteID
 }
 
+func (s *sprite) GetUniqueName() string {
+	return s.UniqueName
+}
+
 // Updates
 func (s *sprite) Costume(name string) {
 	s.constumeName = name
-	s.minUpdate()
+	s.fullUpdate()
 }
 
 func (s *sprite) Angle(angleDegrees float64) {
 	s.angleRad = angleDegrees * (math.Pi / 180.0)
-	s.fullUpdate()
+	s.minUpdate()
 
 	s.clickBody.Angle(s.angleRad)
 }
@@ -141,6 +147,8 @@ func (s *sprite) All(in models.SpriteState) {
 
 func (s *sprite) GetState() models.SpriteState {
 	return models.SpriteState{
+		SpriteID:     s.spriteID,
+		UniqueName:   s.UniqueName,
 		CostumeName:  s.constumeName,
 		X:            s.x,
 		Y:            s.y,
@@ -150,6 +158,7 @@ func (s *sprite) GetState() models.SpriteState {
 		ScaleX:       s.scaleX,
 		ScaleY:       s.scaleY,
 		Opacity:      s.opacity,
+		Deleted:      s.deleted,
 	}
 }
 
@@ -191,13 +200,7 @@ func (s *sprite) minUpdate() {
 		return
 	}
 
-	update := models.CmdSpriteUpdateMin{
-		SpriteIndex: s.spriteID,
-		CostumeName: s.constumeName,
-		X:           s.x,
-		Y:           s.y,
-	}
-	s.sim.SpriteMinUpdate(&update)
+	s.sim.SpriteUpdatePosAngle(s)
 }
 
 func (s *sprite) fullUpdate() {
@@ -206,17 +209,5 @@ func (s *sprite) fullUpdate() {
 		return
 	}
 
-	update := models.CmdSpriteUpdateFull{
-		SpriteIndex: s.spriteID,
-		CostumeName: s.constumeName,
-		X:           s.x,
-		Y:           s.y,
-		Z:           s.z,
-		Angle:       s.angleRad,
-		Visible:     s.visible,
-		XScale:      s.scaleX,
-		YScale:      s.scaleY,
-		Opacity:     s.opacity,
-	}
-	s.sim.SpriteFullUpdate(&update)
+	s.sim.SpriteUpdateFull(s)
 }

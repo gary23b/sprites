@@ -45,11 +45,11 @@ type EbitenGame struct {
 	controlsPressed      *models.UserInput
 	controlsJustPresssed *models.UserInput
 
-	cmdChan       chan any
-	spriteMutex   sync.Mutex // only for protecting nextSpriteID
-	nextSpriteID  int
-	idToSpriteMap map[int]*ebitenSprite
-	sprites       [][]*ebitenSprite // The sprites seperated into layers 0 through 9
+	cmdChan      chan any
+	spriteMutex  sync.Mutex // only for protecting nextSpriteID
+	nextSpriteID int
+	idToSprite   []*ebitenSprite
+	sprites      [][]*ebitenSprite // The sprites seperated into layers 0 through 9
 
 	costumes           []ebiten.Image
 	nameToCostumeIDMap map[string]int
@@ -73,10 +73,10 @@ func NewGame(init GameInitStruct) *EbitenGame {
 		showFPS:           init.showFPS,
 		justPressedBroker: init.justPressedBroker,
 
-		cmdChan:       make(chan any, 100000),
-		nextSpriteID:  3599,
-		sprites:       make([][]*ebitenSprite, 10),
-		idToSpriteMap: make(map[int]*ebitenSprite, 10000),
+		cmdChan:      make(chan any, 100000),
+		nextSpriteID: 0,
+		sprites:      make([][]*ebitenSprite, 10),
+		idToSprite:   make([]*ebitenSprite, 0, 31000), // Not sure if this should be an list or map...
 
 		costumes:           make([]ebiten.Image, 0, 1000),
 		nameToCostumeIDMap: make(map[string]int),
@@ -86,7 +86,7 @@ func NewGame(init GameInitStruct) *EbitenGame {
 	}
 
 	for i := 0; i < 10; i++ {
-		g.sprites[i] = make([]*ebitenSprite, 0, 1000)
+		g.sprites[i] = make([]*ebitenSprite, 0, 31000)
 	}
 
 	// ebiten.SetTPS(120)
@@ -99,10 +99,10 @@ func NewGame(init GameInitStruct) *EbitenGame {
 
 func (g *EbitenGame) deleteAllSprite() {
 	// Deleting everything means just allowcating new arrays.
-	g.idToSpriteMap = make(map[int]*ebitenSprite, 10000)
+	g.idToSprite = make([]*ebitenSprite, 0, 31000)
 	g.sprites = make([][]*ebitenSprite, 10)
 	for i := 0; i < 10; i++ {
-		g.sprites[i] = make([]*ebitenSprite, 0, 1000)
+		g.sprites[i] = make([]*ebitenSprite, 0, 31000)
 	}
 }
 
@@ -116,6 +116,7 @@ func (g *EbitenGame) GetNextSpriteID() int {
 
 	newID := g.nextSpriteID
 	g.nextSpriteID++
+	g.idToSprite = append(g.idToSprite, nil)
 
 	return newID
 }
@@ -131,7 +132,7 @@ func (g *EbitenGame) addSprite(newID int) {
 	}
 
 	g.sprites[0] = append(g.sprites[0], &newSprite)
-	g.idToSpriteMap[newSprite.id] = g.sprites[0][newSprite.arrayIndex]
+	g.idToSprite[newSprite.id] = g.sprites[0][newSprite.arrayIndex]
 }
 
 func (g *EbitenGame) addSpriteCostume(img image.Image, costumeName string) {
@@ -143,12 +144,8 @@ func (g *EbitenGame) addSpriteCostume(img image.Image, costumeName string) {
 }
 
 func (g *EbitenGame) deleteSprite(spriteIndex int) {
-	s, ok := g.idToSpriteMap[spriteIndex]
-	if !ok {
-		log.Printf("The given sprite index is not valid: %d\n", spriteIndex)
-		return
-	}
-	delete(g.idToSpriteMap, spriteIndex)
+	s := g.idToSprite[spriteIndex]
+	g.idToSprite[spriteIndex] = nil
 	g.sprites[s.z][s.arrayIndex] = nil
 
 	s.visible = false
@@ -159,7 +156,7 @@ func (g *EbitenGame) moveSpriteToNewLayer(s *ebitenSprite, newZ int) *ebitenSpri
 	g.sprites[s.z][s.arrayIndex] = nil
 	g.sprites[newZ] = append(g.sprites[newZ], s)
 	newIndex := len(g.sprites[newZ]) - 1
-	g.idToSpriteMap[s.id] = s
+	g.idToSprite[s.id] = s
 	s.arrayIndex = newIndex
 	s.z = newZ
 	return s
@@ -173,34 +170,20 @@ EatSpritesCmdLoop:
 		case cmd := <-g.cmdChan:
 			switch v := cmd.(type) {
 			case models.CmdSpriteUpdateMin:
-				s, ok := g.idToSpriteMap[v.SpriteIndex]
-				if !ok {
-					log.Printf("The given sprite index is not valid: %d\n", v.SpriteIndex)
-					continue
-				}
-
-				costumeID, ok := g.nameToCostumeIDMap[v.CostumeName]
-				if !ok {
-					log.Printf("The given costume name is not valid: %d, %s\n", v.SpriteIndex, v.CostumeName)
-					continue
-				}
-				s.CostumeIndex = costumeID
+				s := g.idToSprite[v.SpriteID]
 				s.x = v.X
 				s.y = v.Y
+				s.angleRad = v.AngleRad
 
 			case models.CmdSpriteUpdateFull:
-				s, ok := g.idToSpriteMap[v.SpriteIndex]
-				if !ok {
-					log.Printf("The given sprite index is not valid: %d\n", v.SpriteIndex)
-					continue
-				}
+				s := g.idToSprite[v.SpriteID]
 				if s.z != v.Z {
 					s = g.moveSpriteToNewLayer(s, v.Z)
 				}
 
 				costumeID, ok := g.nameToCostumeIDMap[v.CostumeName]
 				if !ok {
-					log.Printf("The given costume name is not valid: %d, %s\n", v.SpriteIndex, v.CostumeName)
+					log.Printf("The given costume name is not valid: %d, %s\n", v.SpriteID, v.CostumeName)
 					continue
 				}
 				s.CostumeIndex = costumeID
@@ -216,7 +199,7 @@ EatSpritesCmdLoop:
 			case models.CmdAddCostume:
 				g.addSpriteCostume(v.Img, v.CostumeName)
 			case models.CmdSpriteDelete:
-				g.deleteSprite(v.SpriteIndex)
+				g.deleteSprite(v.SpriteID)
 			case models.CmdSpritesDeleteAll:
 				g.deleteAllSprite()
 			// Sounds

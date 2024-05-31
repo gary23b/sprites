@@ -20,12 +20,12 @@ func main() {
 func simStartFunc(sim models.Sim) {
 	// sim.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
 
-	textImage := tools.CreateTextBubble("abc")
+	textImage := tools.CreateTextBubble("abasdfasdfadsfasdfadsf\nc234", 16)
 	sim.AddCostume(textImage, "t1")
 
 	a := 0.0
 
-	s := sim.AddSprite()
+	s := sim.AddSprite("mainTurtle")
 	b := s.GetClickBody()
 	s.Costume("t1")
 	s.Scale(1)
