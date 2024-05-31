@@ -48,7 +48,7 @@ func CreateTextBubble(width, height float64, inputText string, size float64) ima
 	DrawRoundedRectangleThoughBubble(dc, 3, 3, width-6, height-30, 10)
 	dc.SetColor(White)
 	dc.FillPreserve()
-	dc.SetColor(Water)
+	dc.SetColor(SkyBlue)
 	dc.SetLineWidth(4)
 	dc.Stroke()
 

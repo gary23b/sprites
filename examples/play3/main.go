@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gary23b/sprites"
@@ -17,13 +18,13 @@ func simStartFunc(sim models.Scratch) {
 	// sim.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
 
 	textImage := tools.CreateTextBubble(200, 100, "abasd sdf sdfsdfsd fs dfsdfsd fsdf sf\n    c234", 20)
-	sim.AddCostume(textImage, "t1")
+	sim.AddCostume(textImage, "textBubble")
 
 	a := 0.0
 
 	s := sim.AddSprite("mainTurtle")
 	b := s.GetClickBody()
-	s.Costume("t1")
+	s.Costume("textBubble")
 	s.Scale(1)
 
 	s.Pos(0, 0)
@@ -48,6 +49,10 @@ MainSpriteLoop:
 			}
 			if i.Mouse.Right {
 				break MainSpriteLoop
+			}
+			if i.Keys.N {
+				textImage := tools.CreateTextBubble(200, 100, fmt.Sprintf("angle=%.0f", a), 30)
+				sim.AddCostume(textImage, "textBubble")
 			}
 		}
 		time.Sleep(time.Millisecond * 10)

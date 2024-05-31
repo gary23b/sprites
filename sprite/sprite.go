@@ -40,7 +40,7 @@ type sprite struct {
 
 	deleted bool
 
-	clickBody     *tools.ClickOnBody
+	clickBody     models.ClickOnBody
 	userInputChan chan *models.UserInput
 }
 
@@ -57,6 +57,15 @@ func NewSprite(sim models.Scratch, UniqueName string, spriteID int) *sprite {
 		clickBody:  tools.NewTouchCollisionBody(),
 	}
 	return ret
+}
+
+func (s *sprite) Clone(UniqueName string) models.Sprite {
+	sClone := s.sim.AddSprite(UniqueName)
+	sClone.All(s.GetState())
+	if s.clickBody != nil {
+		sClone.ReplaceClickBody(s.clickBody.Clone())
+	}
+	return sClone
 }
 
 func (s *sprite) GetSpriteID() int {
@@ -170,6 +179,12 @@ func (s *sprite) DeleteSprite() {
 
 func (s *sprite) GetClickBody() models.ClickOnBody {
 	return s.clickBody
+}
+
+func (s *sprite) ReplaceClickBody(in models.ClickOnBody) {
+	s.clickBody = in
+	s.clickBody.Pos(s.x, s.y)
+	s.clickBody.Angle(s.angleRad)
 }
 
 func (s *sprite) PressedUserInput() *models.UserInput {

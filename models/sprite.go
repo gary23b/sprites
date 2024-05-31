@@ -18,6 +18,7 @@ type SpriteState struct {
 type Sprite interface {
 	GetSpriteID() int
 	GetUniqueName() string
+	Clone(UniqueName string) Sprite
 
 	// Updates
 	Costume(name string)
@@ -35,6 +36,7 @@ type Sprite interface {
 
 	// Click Body
 	GetClickBody() ClickOnBody
+	ReplaceClickBody(in ClickOnBody)
 
 	// User Input
 	PressedUserInput() *UserInput

@@ -141,9 +141,17 @@ func (g *EbitenGame) addSprite(newID int) {
 
 func (g *EbitenGame) addSpriteCostume(img image.Image, costumeName string) {
 	newSprite := ebiten.NewImageFromImage(img)
+
+	// check if we should replace an existing costume:
+	id, ok := g.nameToCostumeIDMap[costumeName]
+	if ok {
+		g.costumes[id] = *newSprite
+		fmt.Printf("Replacing a sprite: %s\n", costumeName)
+		return
+	}
+
 	g.costumes = append(g.costumes, *newSprite)
 	g.nameToCostumeIDMap[costumeName] = len(g.costumes) - 1
-
 	fmt.Println("creating a new sprite")
 }
 

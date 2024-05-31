@@ -176,3 +176,10 @@ func overlapCircleRectange(c *circle, r *rectangle) bool {
 	return distance < c1.radius+c2.radius
 }
 */
+
+func (s *ClickOnBody) Clone() models.ClickOnBody {
+	ret := *s
+	copy(ret.circles, s.circles)
+	copy(ret.rectangles, s.rectangles)
+	return &ret
+}
