@@ -19,7 +19,8 @@ The goals are many:
 
 ## Install
 
-Go 1.21 or later is required.<br>
+Go 1.21 or later is required.
+
 Ebitengine is the main dependency. [Check here for the system specific instructions](https://ebitengine.org/en/documents/install.html).
 
 ## Example
@@ -109,7 +110,7 @@ go run github.com/gary23b/sprites/examples/fallingturtles@latest
 
 Here is a simulation of a rotating box filled with circles, boxes, and rounded rectangles. This uses the library github.com/jakecoffman/cp for the physics simulation. The sprites are being drawn using Golang Scratch.
 
-This is a recreation of https://jakecoffman.com/cp-ebiten/tumble/ except without drawing the shapes using ebiten and cp directly. Here, cp is only performing the physics updates. The original code can be found [here](https://github.com/jakecoffman/cp-examples/blob/master/tumble/tumble.go)
+This is a recreation of <https://jakecoffman.com/cp-ebiten/tumble/> except without drawing the shapes using ebiten and cp directly. Here, cp is only performing the physics updates. The original code can be found [here](https://github.com/jakecoffman/cp-examples/blob/master/tumble/tumble.go)
 
 ```bash
 go run github.com/gary23b/sprites/examples/tumbler@latest
@@ -145,7 +146,7 @@ GOOS=js  GOARCH=wasm go build ./examples/fallingturtles/
 
 ## Things to Research
 
-* https://jakecoffman.com/cp-ebiten/
-* https://github.com/jakecoffman/cp
-* https://github.com/jakecoffman/cp-examples
-* https://github.com/jakecoffman/cp-ebiten
+- <https://jakecoffman.com/cp-ebiten/>
+- <https://github.com/jakecoffman/cp>
+- <https://github.com/jakecoffman/cp-examples>
+- <https://github.com/jakecoffman/cp-ebiten>

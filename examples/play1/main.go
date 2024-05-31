@@ -41,7 +41,7 @@ func simStartFunc(sim models.Scratch) {
 
 func testScene(sim models.Scratch) {
 
-	broker := tools.NewBroker[string]()
+	broker := tools.NewBroker[string](100)
 
 	s := sim.AddSprite("mainTurtle")
 	s.Costume("t1")
@@ -69,7 +69,7 @@ func testScene(sim models.Scratch) {
 	// sim.PlaySound("jab", .9)
 	// time.Sleep(time.Millisecond * 200)
 	// sim.PlaySound("jab", 1)
-	for i := 0; i < 30000; i++ {
+	for i := 0; i < 5000; i++ {
 		go turtle(sim, broker)
 	}
 

@@ -1,3 +1,7 @@
+// Tell the compile that this file should only be compiled for Windows, Linux, Mac.
+//go:build linux || windows || darwin
+// +build linux windows darwin
+
 package sprites
 
 import (
@@ -47,7 +51,6 @@ func CreateGif(
 	frames := TakeScreenshotVideo(sim, delayBetweenScreenshots, frameCount)
 
 	fmt.Printf("GIF: %s: Processing images\n", outputGifFilePath)
-
 	err := easygif.MostCommonColorsWrite(frames, delayBetweenGifFrames, outputGifFilePath)
 	if err != nil {
 		log.Printf("Error while running easygif.EasyGifWrite(): %v\n", err)

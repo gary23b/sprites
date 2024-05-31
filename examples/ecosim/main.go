@@ -42,8 +42,10 @@ func simStartFunc(sim models.Scratch) {
 	sim.AddCostume(img, "Grass")
 	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "Bunny")
 
-	for x := 0; x < 100; x += 10 {
-		go Main_Grass(sim, float64(x), 0)
+	for y := -300; y < 300; y += 10 {
+		for x := -300; x < 300; x += 10 {
+			go Main_Grass(sim, float64(x), float64(y))
+		}
 	}
 
 	// go Main_Grass(sim, 0, 0)

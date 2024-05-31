@@ -43,7 +43,7 @@ func Start(params ScratchParams, simStartFunc func(models.Scratch)) {
 	ret := &scratchState{
 		width:             params.Width,
 		height:            params.Height,
-		justPressedBroker: tools.NewBroker[*models.UserInput](),
+		justPressedBroker: tools.NewBroker[*models.UserInput](100),
 		posBroker:         tools.NewPositionBroker(),
 		idToSpriteMap:     make(map[int]models.Sprite),
 		nameToSpriteMap:   make(map[string]models.Sprite),
