@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/gary23b/sprites/ebitensim"
@@ -17,8 +19,26 @@ func main() {
 	ebitensim.StartSim(params, simStartFunc)
 }
 
+func fileExists(path string) bool {
+	_, err := os.Stat("/path/to/whatever")
+	return !errors.Is(err, os.ErrNotExist)
+}
+
 func simStartFunc(sim models.Sim) {
 	sim.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
+
+	if fileExists("jab.wav") {
+		sim.AddSound("jab.wav", "jab")
+		sim.AddSound("jump.ogg", "jump")
+		sim.AddSound("ragtime.mp3", "ragtime")
+	} else {
+		sim.AddSound("./examples/play1/jab.wav", "jab")
+		sim.AddSound("./examples/play1/jump.ogg", "jump")
+		sim.AddSound("./examples/play1/ragtime.mp3", "ragtime")
+	}
+
+	sim.PlaySound("ragtime", .1)
+
 	testScene(sim)
 }
 
@@ -29,8 +49,27 @@ func testScene(sim models.Sim) {
 	s.Scale(10)
 	s.Z(0)
 	s.Visible(true)
-	time.Sleep(time.Millisecond * 20)
 
+	// time.Sleep(time.Millisecond * 5000)
+	// sim.PlaySound("jab", .001)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .01)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .1)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .4)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .5)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .6)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .7)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .8)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", .9)
+	// time.Sleep(time.Millisecond * 200)
+	// sim.PlaySound("jab", 1)
 	for i := 0; i < 30000; i++ {
 		go turtle(sim)
 	}

@@ -72,3 +72,19 @@ func (sim *simStruct) AddCostume(img image.Image, name string) {
 	}
 	sim.cmdChan <- update
 }
+
+func (sim *simStruct) AddSound(path, name string) {
+	cmd := cmdAddSound{
+		path:      path,
+		soundName: name,
+	}
+	sim.cmdChan <- cmd
+}
+
+func (sim *simStruct) PlaySound(name string, volume float64) {
+	cmd := cmdPlaySound{
+		soundName: name,
+		volume:    volume,
+	}
+	sim.cmdChan <- cmd
+}

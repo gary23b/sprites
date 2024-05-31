@@ -199,6 +199,16 @@ type spriteAddCostume struct {
 	img         image.Image
 }
 
+type cmdAddSound struct {
+	path      string
+	soundName string
+}
+
+type cmdPlaySound struct {
+	soundName string
+	volume    float64 // between 0 and 1.
+}
+
 func (s *sprite) minUpdate() {
 	if s.deleted {
 		log.Printf("Error: sprite %d is deleted but being updated\n", s.spriteID)

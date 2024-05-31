@@ -9,7 +9,12 @@ import (
 	"github.com/gary23b/sprites/models"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+)
+
+const (
+	sampleRate = 48000
 )
 
 type ebitenSprite struct {
@@ -44,6 +49,10 @@ type EbitenGame struct {
 
 	costumes           []ebiten.Image
 	nameToCostumeIDMap map[string]int
+
+	// Sounds:
+	audioContext *audio.Context
+	sounds       map[string][]byte
 }
 
 func NewGame(width, height int, showFPS bool) *EbitenGame {
@@ -59,6 +68,9 @@ func NewGame(width, height int, showFPS bool) *EbitenGame {
 
 		costumes:           make([]ebiten.Image, 0, 1000),
 		nameToCostumeIDMap: make(map[string]int),
+
+		audioContext: audio.NewContext(sampleRate),
+		sounds:       make(map[string][]byte),
 	}
 
 	for i := 0; i < 10; i++ {
@@ -195,6 +207,12 @@ EatSpritesCmdLoop:
 				g.deleteSprite(v.SpriteIndex)
 			case spriteCmdDeleteAll:
 				g.deleteAllSprite()
+			// Sounds
+			case cmdAddSound:
+				g.addSound(v.path, v.soundName)
+
+			case cmdPlaySound:
+				g.playSound(v.soundName, v.volume)
 
 			default:
 				log.Printf("I don't know about type %T!\n", v)
