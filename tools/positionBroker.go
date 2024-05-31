@@ -63,8 +63,8 @@ func (s *PositionBroker) GetSpriteInfo(name string) models.SpriteState {
 	defer s.mutex.RUnlock()
 	item, ok := s.sprites[name]
 	if !ok {
-		log.Printf("Name: %s was not found\n", name)
-		return models.SpriteState{}
+		// log.Printf("Name: %s was not found\n", name)
+		return models.SpriteState{Deleted: true}
 	}
 	item.mutex.Lock()
 	defer item.mutex.Unlock()

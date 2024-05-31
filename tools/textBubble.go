@@ -13,16 +13,6 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
-var (
-	Water  color.RGBA = color.RGBA{0x23, 0x89, 0xDA, 0xFF} // 2389DA
-	Black  color.RGBA = color.RGBA{0x00, 0x00, 0x00, 0xFF}
-	White  color.RGBA = color.RGBA{0xFF, 0xFF, 0xFF, 0xFF}
-	Red    color.RGBA = color.RGBA{0xFF, 0x00, 0x00, 0xFF}
-	Green  color.RGBA = color.RGBA{0x00, 0xFF, 0x00, 0xFF}
-	Blue   color.RGBA = color.RGBA{0x00, 0x00, 0xFF, 0xFF}
-	Purple color.RGBA = color.RGBA{0xFF, 0x00, 0xFF, 0xFF}
-)
-
 func MakeTextBubbleShape(w, h float64) image.Image {
 	i := imagedraw.NewImageDraw(int(w), int(h))
 	i.Color(White)

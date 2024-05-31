@@ -4,7 +4,7 @@ import (
 	"image"
 )
 
-type Sim interface {
+type Scratch interface {
 	GetWidth() int
 	GetHeight() int
 

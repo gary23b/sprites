@@ -3,25 +3,20 @@ package main
 import (
 	"time"
 
+	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/game"
 	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/sim"
 )
 
 func main() {
-	params := sim.SimParams{
-		Width:   1000,
-		Height:  1000,
-		ShowFPS: true,
-	}
-	sim.StartSim(params, simStartFunc)
+	params := sprites.ScratchParams{Width: 1000, Height: 1000, ShowFPS: true}
+	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim models.Sim) {
+func simStartFunc(sim models.Scratch) {
 	sim.AddCostume(game.DecodeCodedSprite(game.TurtleImage), "t1")
 
 	a := 0.0
-
 	s := sim.AddSprite("mainTurtle")
 	s.Costume("t1")
 	s.Scale(10)
@@ -58,7 +53,7 @@ MainSpriteLoop:
 	sim.Exit()
 }
 
-func t2(sim models.Sim) {
+func t2(sim models.Scratch) {
 	s := sim.AddSprite("t2")
 	s.Costume("t1")
 	s.Scale(1)
@@ -68,7 +63,9 @@ func t2(sim models.Sim) {
 	// MainSpriteLoop:
 	for {
 		t1Info := sim.GetSpriteInfo("mainTurtle")
-		s.Pos(t1Info.X-500, t1Info.Y)
+		if !t1Info.Deleted {
+			s.Pos(t1Info.X-500, t1Info.Y)
+		}
 
 		time.Sleep(time.Millisecond * 10)
 	}

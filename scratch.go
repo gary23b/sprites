@@ -1,4 +1,4 @@
-package sim
+package sprites
 
 import (
 	"image"
@@ -11,7 +11,7 @@ import (
 	"github.com/gary23b/sprites/tools"
 )
 
-type simStruct struct {
+type scratchState struct {
 	width   int
 	height  int
 	g       *game.EbitenGame
@@ -21,19 +21,19 @@ type simStruct struct {
 	posBroker         *tools.PositionBroker
 }
 
-var _ models.Sim = &simStruct{} // Force the linter to tell us if the interface is implemented
+var _ models.Scratch = &scratchState{} // Force the linter to tell us if the interface is implemented
 
-type SimParams struct {
-	Width   int
-	Height  int
-	ShowFPS bool
+type ScratchParams struct {
+	Width   int  // Window Width in pixels
+	Height  int  // Window Height in pixels
+	ShowFPS bool // Show Frame-Rate and Update-Rate information in top left corner of window
 }
 
 // The drawFunc will be started as a go routine.
-func StartSim(params SimParams, simStartFunc func(models.Sim)) {
+func Start(params ScratchParams, simStartFunc func(models.Scratch)) {
 	log.SetFlags(log.Ltime | log.Lmicroseconds | log.Lshortfile)
 
-	ret := &simStruct{
+	ret := &scratchState{
 		width:             params.Width,
 		height:            params.Height,
 		justPressedBroker: tools.NewBroker[*models.UserInput](),
@@ -52,11 +52,11 @@ func StartSim(params SimParams, simStartFunc func(models.Sim)) {
 	ret.g.RunGame()
 }
 
-func (s *simStruct) Exit() {
+func (s *scratchState) Exit() {
 	s.g.TellGameToExit()
 }
 
-func (s *simStruct) AddSprite(UniqueName string) models.Sprite {
+func (s *scratchState) AddSprite(UniqueName string) models.Sprite {
 	spriteID := s.g.GetNextSpriteID()
 	update := models.CmdAddNewSprite{
 		SpriteID: spriteID,
@@ -69,7 +69,7 @@ func (s *simStruct) AddSprite(UniqueName string) models.Sprite {
 	return ret
 }
 
-func (s *simStruct) DeleteSprite(in models.Sprite) {
+func (s *scratchState) DeleteSprite(in models.Sprite) {
 	s.posBroker.RemoveSprite(in.GetUniqueName())
 	update := models.CmdSpriteDelete{
 		SpriteID: in.GetSpriteID(),
@@ -77,13 +77,13 @@ func (s *simStruct) DeleteSprite(in models.Sprite) {
 	s.cmdChan <- update
 }
 
-func (s *simStruct) DeleteAllSprites() {
+func (s *scratchState) DeleteAllSprites() {
 	update := models.CmdSpritesDeleteAll{}
 	s.cmdChan <- update
 	s.posBroker = tools.NewPositionBroker()
 }
 
-func (s *simStruct) SpriteUpdatePosAngle(in models.Sprite) {
+func (s *scratchState) SpriteUpdatePosAngle(in models.Sprite) {
 	status := in.GetState()
 	s.posBroker.UpdateSpriteInfo(status.UniqueName, status)
 	cmd := models.CmdSpriteUpdateMin{
@@ -96,7 +96,7 @@ func (s *simStruct) SpriteUpdatePosAngle(in models.Sprite) {
 	s.cmdChan <- cmd
 }
 
-func (s *simStruct) SpriteUpdateFull(in models.Sprite) {
+func (s *scratchState) SpriteUpdateFull(in models.Sprite) {
 	status := in.GetState()
 	s.posBroker.UpdateSpriteInfo(status.UniqueName, status)
 	cmd := models.CmdSpriteUpdateFull{
@@ -115,32 +115,32 @@ func (s *simStruct) SpriteUpdateFull(in models.Sprite) {
 	s.cmdChan <- cmd
 }
 
-func (s *simStruct) GetSpriteInfo(UniqueName string) models.SpriteState {
+func (s *scratchState) GetSpriteInfo(UniqueName string) models.SpriteState {
 	return s.posBroker.GetSpriteInfo(UniqueName)
 }
 
-func (s *simStruct) GetWidth() int {
+func (s *scratchState) GetWidth() int {
 	return s.width
 }
 
-func (s *simStruct) GetHeight() int {
+func (s *scratchState) GetHeight() int {
 	return s.height
 }
 
-func (s *simStruct) PressedUserInput() *models.UserInput {
+func (s *scratchState) PressedUserInput() *models.UserInput {
 	ret := s.g.PressedUserInput()
 	return ret
 }
 
-func (s *simStruct) SubscribeToJustPressedUserInput() chan *models.UserInput {
+func (s *scratchState) SubscribeToJustPressedUserInput() chan *models.UserInput {
 	return s.justPressedBroker.Subscribe()
 }
 
-func (s *simStruct) UnSubscribeToJustPressedUserInput(in chan *models.UserInput) {
+func (s *scratchState) UnSubscribeToJustPressedUserInput(in chan *models.UserInput) {
 	s.justPressedBroker.Unsubscribe(in)
 }
 
-func (sim *simStruct) AddCostume(img image.Image, name string) {
+func (sim *scratchState) AddCostume(img image.Image, name string) {
 	update := models.CmdAddCostume{
 		Img:         img,
 		CostumeName: name,
@@ -148,7 +148,7 @@ func (sim *simStruct) AddCostume(img image.Image, name string) {
 	sim.cmdChan <- update
 }
 
-func (sim *simStruct) AddSound(path, name string) {
+func (sim *scratchState) AddSound(path, name string) {
 	cmd := models.CmdAddSound{
 		Path:      path,
 		SoundName: name,
@@ -156,10 +156,29 @@ func (sim *simStruct) AddSound(path, name string) {
 	sim.cmdChan <- cmd
 }
 
-func (sim *simStruct) PlaySound(name string, volume float64) {
+func (sim *scratchState) PlaySound(name string, volume float64) {
 	cmd := models.CmdPlaySound{
 		SoundName: name,
 		Volume:    volume,
 	}
 	sim.cmdChan <- cmd
+}
+
+// This returns nil if there is no new data.
+// This will throw away all but the newest set of data available. So this should be called faster that the game update rate (60Hz),
+// otherwise sim.PressedUserInput() should be used instead.
+func GetNewestJustPressedFromChan(justPressedChan chan *models.UserInput) *models.UserInput {
+	var ret *models.UserInput
+
+ChanExtractionLoop:
+	for {
+		select {
+		case i := <-justPressedChan:
+			ret = i
+		default:
+			// receiving from chan would block
+			break ChanExtractionLoop
+		}
+	}
+	return ret
 }
