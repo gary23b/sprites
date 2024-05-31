@@ -63,7 +63,7 @@ func simStartFunc(sim models.Scratch) {
 	// Loop forever
 	for {
 		// perform x steps per image update.
-		for i := 0; i < 5; i++ {
+		for i := 0; i < 1; i++ {
 			w1, w2, theta1, theta2 = step(w1, w2, theta1, theta2)
 			x1, y1, x2, y2 := GetPos(w1, w2, theta1, theta2, scaleUpBy)
 			mass1.Pos(x1, y1)
