@@ -9,7 +9,7 @@ import (
 )
 
 type bunny struct {
-	sim    spritesmodels.Scratch
+	sim    spritesmodels.Sim
 	sprite spritesmodels.Sprite
 	food   *spritesmodels.NearMeInfo
 	x, y   float64
@@ -20,7 +20,7 @@ type bunny struct {
 	spawnCounter int
 }
 
-func Main_Bunny(sim spritesmodels.Scratch, x, y float64) {
+func Main_Bunny(sim spritesmodels.Sim, x, y float64) {
 
 	s := sim.AddSprite("")
 	s.Costume("Bunny")

@@ -19,7 +19,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Scratch) {
+func simStartFunc(sim spritesmodels.Sim) {
 	// Starting conditions
 	theta1 := (math.Pi / 180.0) * 180.1
 	theta2 := (math.Pi / 180.0) * 180.0

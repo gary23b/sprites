@@ -25,7 +25,7 @@ func LoadSpriteFile(path string) (image.Image, error) {
 }
 
 type sprite struct {
-	sim spritesmodels.Scratch
+	sim spritesmodels.Sim
 
 	spriteID    int
 	spriteType  int
@@ -48,7 +48,7 @@ type sprite struct {
 
 var _ spritesmodels.Sprite = &sprite{}
 
-func NewSprite(sim spritesmodels.Scratch, uniqueName string, spriteID int) *sprite {
+func NewSprite(sim spritesmodels.Sim, uniqueName string, spriteID int) *sprite {
 	ret := &sprite{
 		spriteID:     spriteID,
 		UniqueName:   uniqueName,

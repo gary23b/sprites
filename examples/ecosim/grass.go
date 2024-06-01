@@ -10,7 +10,7 @@ import (
 
 type GrassHasBeenEaten struct{}
 
-func Main_Grass(sim spritesmodels.Scratch, x, y float64) {
+func Main_Grass(sim spritesmodels.Sim, x, y float64) {
 	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
 	x = float64(int(x))
 	y = float64(int(y))

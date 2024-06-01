@@ -10,7 +10,7 @@ type NearMeInfo struct {
 	X, Y       float64
 }
 
-type Scratch interface {
+type Sim interface {
 	GetWidth() int
 	GetHeight() int
 
