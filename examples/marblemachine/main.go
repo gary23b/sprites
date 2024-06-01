@@ -14,7 +14,7 @@ import (
 
 // https://github.com/jakecoffman/cp-ebiten/tree/gh-pages
 func main() {
-	params := sprites.ScratchParams{Width: 1000, Height: 1000, ShowFPS: true}
+	params := sprites.SimParams{Width: 1000, Height: 1000, ShowFPS: true}
 	sprites.Start(params, simStartFunc)
 }
 

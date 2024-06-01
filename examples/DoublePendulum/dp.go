@@ -12,7 +12,7 @@ const (
 )
 
 // dw/dt function for theta 1
-func funcdwdt1(theta1, theta2, w1, w2 float64) float64 {
+func func_dwdt1(theta1, theta2, w1, w2 float64) float64 {
 	cos12 := math.Cos(theta1 - theta2)
 	sin12 := math.Sin(theta1 - theta2)
 	sin1 := math.Sin(theta1)
@@ -23,7 +23,7 @@ func funcdwdt1(theta1, theta2, w1, w2 float64) float64 {
 }
 
 // dw/dt function for theta 2
-func funcdwdt2(theta2, theta1, w1, w2 float64) float64 {
+func func_dwdt2(theta2, theta1, w1, w2 float64) float64 {
 	cos12 := math.Cos(theta1 - theta2)
 	sin12 := math.Sin(theta1 - theta2)
 	sin1 := math.Sin(theta1)
@@ -34,37 +34,37 @@ func funcdwdt2(theta2, theta1, w1, w2 float64) float64 {
 }
 
 // d0/dt function for theta 1
-func funcd0dt1(w0 float64) float64 {
+func func_d0dt1(w0 float64) float64 {
 	return w0
 }
 
 // d0/dt function for theta 2
-func funcd0dt2(w0 float64) float64 {
+func func_d0dt2(w0 float64) float64 {
 	return w0
 }
 
 func step(w1, w2, theta1, theta2 float64) (float64, float64, float64, float64) {
-	k1a := h * funcd0dt1(w1)                     // gives theta1
-	k1b := h * funcdwdt1(theta1, theta2, w1, w2) // gives omega1
-	k1c := h * funcd0dt2(w2)                     // gives theta2
-	k1d := h * funcdwdt2(theta2, theta1, w1, w2) // gives omega2
+	k1a := h * func_d0dt1(w1)                     // gives theta1
+	k1b := h * func_dwdt1(theta1, theta2, w1, w2) // gives omega1
+	k1c := h * func_d0dt2(w2)                     // gives theta2
+	k1d := h * func_dwdt2(theta2, theta1, w1, w2) // gives omega2
 
-	k2a := h * funcd0dt1(w1+(0.5*k1b))
-	k2b := h * funcdwdt1(theta1+(0.5*k1a), theta2, w1, w2)
-	k2c := h * funcd0dt2(w2+(0.5*k1d))
-	k2d := h * funcdwdt2(theta2+(0.5*k1c), theta1, w1, w2)
+	k2a := h * func_d0dt1(w1+(0.5*k1b))
+	k2b := h * func_dwdt1(theta1+(0.5*k1a), theta2, w1, w2)
+	k2c := h * func_d0dt2(w2+(0.5*k1d))
+	k2d := h * func_dwdt2(theta2+(0.5*k1c), theta1, w1, w2)
 
-	k3a := h * funcd0dt1(w1+(0.5*k2b))
-	k3b := h * funcdwdt1(theta1+(0.5*k2a), theta2, w1, w2)
-	k3c := h * funcd0dt2(w2+(0.5*k2d))
-	k3d := h * funcdwdt2(theta2+(0.5*k2c), theta1, w1, w2)
+	k3a := h * func_d0dt1(w1+(0.5*k2b))
+	k3b := h * func_dwdt1(theta1+(0.5*k2a), theta2, w1, w2)
+	k3c := h * func_d0dt2(w2+(0.5*k2d))
+	k3d := h * func_dwdt2(theta2+(0.5*k2c), theta1, w1, w2)
 
-	k4a := h * funcd0dt1(w1+k3b)
-	k4b := h * funcdwdt1(theta1+k3a, theta2, w1, w2)
-	k4c := h * funcd0dt2(w2+k3d)
-	k4d := h * funcdwdt2(theta2+k3c, theta1, w1, w2)
+	k4a := h * func_d0dt1(w1+k3b)
+	k4b := h * func_dwdt1(theta1+k3a, theta2, w1, w2)
+	k4c := h * func_d0dt2(w2+k3d)
+	k4d := h * func_dwdt2(theta2+k3c, theta1, w1, w2)
 
-	//summing the values after the iterations
+	// summing the values after the iterations
 	theta1 += 1.0 / 6.0 * (k1a + 2*k2a + 2*k3a + k4a)
 	w1 += 1.0 / 6.0 * (k1b + 2*k2b + 2*k3b + k4b)
 	theta2 += 1.0 / 6.0 * (k1c + 2*k2c + 2*k3c + k4c)
@@ -72,7 +72,7 @@ func step(w1, w2, theta1, theta2 float64) (float64, float64, float64, float64) {
 	return w1, w2, theta1, theta2
 }
 
-func GetPos(w1, w2, theta1, theta2, scale float64) (x1, y1, x2, y2 float64) {
+func GetPos(w1, w2, theta1, theta2, scale float64) (x1, y1, x2, y2 float64) { //nolint:unparam
 	x1 = L1 * math.Sin(theta1)
 	y1 = -L1 * math.Cos(theta1)
 	x2 = x1 + L2*math.Sin(theta2)
