@@ -8,7 +8,7 @@ import (
 	"math"
 	"os"
 
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 )
 
@@ -25,7 +25,7 @@ func LoadSpriteFile(path string) (image.Image, error) {
 }
 
 type sprite struct {
-	sim models.Scratch
+	sim spritesmodels.Scratch
 
 	spriteID    int
 	spriteType  int
@@ -41,14 +41,14 @@ type sprite struct {
 
 	deleted bool
 
-	clickBody     models.ClickOnBody
-	userInputChan chan *models.UserInput
+	clickBody     spritesmodels.ClickOnBody
+	userInputChan chan *spritesmodels.UserInput
 	receivedMsgs  chan any
 }
 
-var _ models.Sprite = &sprite{}
+var _ spritesmodels.Sprite = &sprite{}
 
-func NewSprite(sim models.Scratch, uniqueName string, spriteID int) *sprite {
+func NewSprite(sim spritesmodels.Scratch, uniqueName string, spriteID int) *sprite {
 	ret := &sprite{
 		spriteID:     spriteID,
 		UniqueName:   uniqueName,
@@ -62,7 +62,7 @@ func NewSprite(sim models.Scratch, uniqueName string, spriteID int) *sprite {
 	return ret
 }
 
-func (s *sprite) Clone(uniqueName string) models.Sprite {
+func (s *sprite) Clone(uniqueName string) spritesmodels.Sprite {
 	sClone := s.sim.AddSprite(uniqueName)
 	sClone.All(s.GetState())
 	if s.clickBody != nil {
@@ -137,7 +137,7 @@ func (s *sprite) Opacity(opacityPercent float64) {
 	s.fullUpdate()
 }
 
-func (s *sprite) All(in models.SpriteState) {
+func (s *sprite) All(in spritesmodels.SpriteState) {
 	if in.Z < 0 || in.Z > 9 {
 		log.Println("Z must be from 0 to 9")
 		return
@@ -160,8 +160,8 @@ func (s *sprite) All(in models.SpriteState) {
 	s.clickBody.Angle(s.angleRad)
 }
 
-func (s *sprite) GetState() models.SpriteState {
-	return models.SpriteState{
+func (s *sprite) GetState() spritesmodels.SpriteState {
+	return spritesmodels.SpriteState{
 		SpriteID:     s.spriteID,
 		SpriteType:   s.spriteType,
 		UniqueName:   s.UniqueName,
@@ -187,21 +187,21 @@ func (s *sprite) DeleteSprite() {
 	s.sim.DeleteSprite(s)
 }
 
-func (s *sprite) GetClickBody() models.ClickOnBody {
+func (s *sprite) GetClickBody() spritesmodels.ClickOnBody {
 	return s.clickBody
 }
 
-func (s *sprite) ReplaceClickBody(in models.ClickOnBody) {
+func (s *sprite) ReplaceClickBody(in spritesmodels.ClickOnBody) {
 	s.clickBody = in
 	s.clickBody.Pos(s.x, s.y)
 	s.clickBody.Angle(s.angleRad)
 }
 
-func (s *sprite) PressedUserInput() *models.UserInput {
+func (s *sprite) PressedUserInput() *spritesmodels.UserInput {
 	return s.sim.PressedUserInput()
 }
 
-func (s *sprite) JustPressedUserInput() *models.UserInput {
+func (s *sprite) JustPressedUserInput() *spritesmodels.UserInput {
 	if s.userInputChan == nil {
 		s.userInputChan = s.sim.SubscribeToJustPressedUserInput()
 	}
@@ -216,7 +216,7 @@ func (s *sprite) JustPressedUserInput() *models.UserInput {
 	return nil
 }
 
-func (s *sprite) WhoIsNearMe(distance float64) []models.NearMeInfo {
+func (s *sprite) WhoIsNearMe(distance float64) []spritesmodels.NearMeInfo {
 	return s.sim.WhoIsNearMe(s.x, s.y, distance)
 }
 

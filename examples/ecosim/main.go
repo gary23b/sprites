@@ -5,8 +5,8 @@ import (
 	"image/color"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/models"
 	"github.com/gary23b/sprites/sprite"
+	"github.com/gary23b/sprites/spritesmodels"
 )
 
 var (
@@ -26,7 +26,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim models.Scratch) {
+func simStartFunc(sim spritesmodels.Scratch) {
 	// Set the background by making a single pixel image and scaling it be be the entire screen.
 	img := image.NewRGBA(image.Rect(0, 0, 1, 1))
 	img.Set(0, 0, SandyBrown)

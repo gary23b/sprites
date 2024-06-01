@@ -5,12 +5,12 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 )
 
 type GrassHasBeenEaten struct{}
 
-func Main_Grass(sim models.Scratch, x, y float64) {
+func Main_Grass(sim spritesmodels.Scratch, x, y float64) {
 	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
 	x = float64(int(x))
 	y = float64(int(y))

@@ -1,4 +1,4 @@
-package models
+package spritesmodels
 
 type ClickOnBody interface {
 	AddCircleBody(x, y, radius float64)

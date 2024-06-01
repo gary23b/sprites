@@ -6,7 +6,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -38,12 +38,12 @@ type EbitenGame struct {
 	screenWidth       int
 	screenHeight      int
 	showFPS           bool
-	justPressedBroker *spritestools.Broker[*models.UserInput]
+	justPressedBroker *spritestools.Broker[*spritesmodels.UserInput]
 	exitFlag          bool
 
 	controlState        SavedControlState
-	controlsPressed     *models.UserInput
-	controlsJustPressed *models.UserInput
+	controlsPressed     *spritesmodels.UserInput
+	controlsJustPressed *spritesmodels.UserInput
 
 	cmdChan      chan any
 	spriteMutex  sync.Mutex // only for protecting nextSpriteID
@@ -65,7 +65,7 @@ type GameInitStruct struct {
 	Width             int
 	Height            int
 	ShowFPS           bool
-	JustPressedBroker *spritestools.Broker[*models.UserInput]
+	JustPressedBroker *spritestools.Broker[*spritesmodels.UserInput]
 }
 
 func NewGame(init GameInitStruct) *EbitenGame {
@@ -183,13 +183,13 @@ EatSpritesCmdLoop:
 		select {
 		case cmd := <-g.cmdChan:
 			switch v := cmd.(type) {
-			case models.CmdSpriteUpdateMin:
+			case spritesmodels.CmdSpriteUpdateMin:
 				s := g.idToSprite[v.SpriteID]
 				s.x = v.X
 				s.y = v.Y
 				s.angleRad = v.AngleRad
 
-			case models.CmdSpriteUpdateFull:
+			case spritesmodels.CmdSpriteUpdateFull:
 				s := g.idToSprite[v.SpriteID]
 				if s.z != v.Z {
 					s = g.moveSpriteToNewLayer(s, v.Z)
@@ -208,22 +208,22 @@ EatSpritesCmdLoop:
 				s.xScale = v.XScale
 				s.yScale = v.YScale
 				s.opacity = v.Opacity
-			case models.CmdAddNewSprite:
+			case spritesmodels.CmdAddNewSprite:
 				g.addSprite(v.SpriteID)
-			case models.CmdAddCostume:
+			case spritesmodels.CmdAddCostume:
 				g.addSpriteCostume(v.Img, v.CostumeName)
-			case models.CmdSpriteDelete:
+			case spritesmodels.CmdSpriteDelete:
 				g.deleteSprite(v.SpriteID)
-			case models.CmdSpritesDeleteAll:
+			case spritesmodels.CmdSpritesDeleteAll:
 				g.deleteAllSprite()
 			// Sounds
-			case models.CmdAddSound:
+			case spritesmodels.CmdAddSound:
 				g.addSound(v.Path, v.SoundName)
 
-			case models.CmdPlaySound:
+			case spritesmodels.CmdPlaySound:
 				g.playSound(v.SoundName, v.Volume)
 
-			case models.CmdGetScreenshot:
+			case spritesmodels.CmdGetScreenshot:
 				g.screenShotRequests = append(g.screenShotRequests, v.ImageChan)
 
 			default:
@@ -316,9 +316,9 @@ func (g *EbitenGame) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return g.screenWidth, g.screenHeight
 }
 
-func (g *EbitenGame) PressedUserInput() *models.UserInput {
+func (g *EbitenGame) PressedUserInput() *spritesmodels.UserInput {
 	if g == nil || g.controlsPressed == nil {
-		return &models.UserInput{}
+		return &spritesmodels.UserInput{}
 	}
 
 	return g.controlsPressed

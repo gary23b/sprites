@@ -1,13 +1,13 @@
 package game
 
 import (
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-func fillKeyStruct(input []ebiten.Key, out *models.UserInput) {
+func fillKeyStruct(input []ebiten.Key, out *spritesmodels.UserInput) {
 	out.AnyPressed = len(input) > 0
 	keys := &out.Keys
 	for _, k := range input {
@@ -177,7 +177,7 @@ type SavedControlState struct {
 }
 
 // Generate a new struct for pressed and just pressed. then it becomes read only to everyone else.
-func (s *SavedControlState) GetUserInput(screenWidth, screenHeight int) (pressed, justPressed *models.UserInput) {
+func (s *SavedControlState) GetUserInput(screenWidth, screenHeight int) (pressed, justPressed *spritesmodels.UserInput) {
 	s.keysDown = inpututil.AppendPressedKeys(s.keysDown[:0])
 	s.keysJustPressed = inpututil.AppendJustPressedKeys(s.keysJustPressed[:0])
 	cursorX, cursorY := ebiten.CursorPosition()
@@ -190,7 +190,7 @@ func (s *SavedControlState) GetUserInput(screenWidth, screenHeight int) (pressed
 	RightJp := inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight)
 
 	// Now fill out the down struct
-	pressed = &models.UserInput{}
+	pressed = &spritesmodels.UserInput{}
 	fillKeyStruct(s.keysDown, pressed)
 	pressed.Mouse.MouseX = cursorX - screenWidth/2
 	pressed.Mouse.MouseY = -cursorY + screenHeight/2
@@ -201,7 +201,7 @@ func (s *SavedControlState) GetUserInput(screenWidth, screenHeight int) (pressed
 	pressed.AnyPressed = pressed.AnyPressed || Left || Center || Right || yScroll != 0
 
 	// Now fill out the justPressed struct
-	justPressed = &models.UserInput{}
+	justPressed = &spritesmodels.UserInput{}
 	fillKeyStruct(s.keysJustPressed, justPressed)
 	justPressed.Mouse.MouseX = cursorX - screenWidth/2
 	justPressed.Mouse.MouseY = -cursorY + screenHeight/2

@@ -8,7 +8,7 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 )
 
@@ -19,7 +19,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim models.Scratch) {
+func simStartFunc(sim spritesmodels.Scratch) {
 	// Starting conditions
 	theta1 := (math.Pi / 180.0) * 180.1
 	theta2 := (math.Pi / 180.0) * 180.0
