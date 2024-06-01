@@ -28,7 +28,7 @@ type scratchState struct {
 	nameToSpriteMap    map[string]spritesmodels.Sprite
 }
 
-var _ spritesmodels.Scratch = &scratchState{} // Force the linter to tell us if the interface is implemented
+var _ spritesmodels.Sim = &scratchState{} // Force the linter to tell us if the interface is implemented
 
 type ScratchParams struct {
 	Width   int  // Window Width in pixels
@@ -37,7 +37,7 @@ type ScratchParams struct {
 }
 
 // The drawFunc will be started as a go routine.
-func Start(params ScratchParams, simStartFunc func(spritesmodels.Scratch)) {
+func Start(params ScratchParams, simStartFunc func(spritesmodels.Sim)) {
 	log.SetFlags(log.Ltime | log.Lmicroseconds | log.Lshortfile)
 
 	ret := &scratchState{

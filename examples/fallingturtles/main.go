@@ -20,7 +20,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Scratch) {
+func simStartFunc(sim spritesmodels.Sim) {
 	go RunMouse(sim)
 
 	// Set the background by making a single pixel image and scaling it be be the entire screen.
@@ -67,7 +67,7 @@ type GameStateStruct struct {
 
 var GameState GameStateStruct
 
-func RunClone(sim spritesmodels.Scratch, s spritesmodels.Sprite) {
+func RunClone(sim spritesmodels.Sim, s spritesmodels.Sprite) {
 	justPressedChan := sim.SubscribeToJustPressedUserInput()
 	cb := s.GetClickBody()
 
@@ -108,7 +108,7 @@ func RunClone(sim spritesmodels.Scratch, s spritesmodels.Sprite) {
 }
 
 // Test the WhoIsNearMe functionality.
-func RunMouse(sim spritesmodels.Scratch) {
+func RunMouse(sim spritesmodels.Sim) {
 	for {
 		posInfo := sim.PressedUserInput()
 		nearMeList := sim.WhoIsNearMe(float64(posInfo.Mouse.MouseX), float64(posInfo.Mouse.MouseY), 50)
@@ -118,7 +118,7 @@ func RunMouse(sim spritesmodels.Scratch) {
 	}
 }
 
-func ShowGameOver(sim spritesmodels.Scratch) {
+func ShowGameOver(sim spritesmodels.Sim) {
 	imgGameOver := spritestools.CreateTextImg(fmt.Sprintf("GAME OVER\nSCORE: %d", GameState.Score), 1000, 130, 60, spritestools.Red)
 	sim.AddCostume(imgGameOver, "GameOver")
 	s := sim.AddSprite("GameOver")

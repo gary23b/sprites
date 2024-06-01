@@ -15,7 +15,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Scratch) {
+func simStartFunc(sim spritesmodels.Sim) {
 	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t")
 
 	// go scratch.CreateGifDithered(sim, time.Millisecond*100, time.Millisecond*100, "./examples/randomwalk/randomwalk.gif", 100)
@@ -26,7 +26,7 @@ func simStartFunc(sim spritesmodels.Scratch) {
 	}
 }
 
-func turtleRandomWalk(sim spritesmodels.Scratch) {
+func turtleRandomWalk(sim spritesmodels.Sim) {
 	s := sim.AddSprite("")
 	s.Costume("t")
 	s.Visible(true)

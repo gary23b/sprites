@@ -21,7 +21,7 @@ func main() {
 // 	return !errors.Is(err, os.ErrNotExist)
 // }
 
-func simStartFunc(sim spritesmodels.Scratch) {
+func simStartFunc(sim spritesmodels.Sim) {
 	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t1")
 
 	// if fileExists("jab.wav") {
@@ -39,7 +39,7 @@ func simStartFunc(sim spritesmodels.Scratch) {
 	testScene(sim)
 }
 
-func testScene(sim spritesmodels.Scratch) {
+func testScene(sim spritesmodels.Sim) {
 
 	broker := spritestools.NewBroker[string](100)
 
@@ -95,7 +95,7 @@ func testScene(sim spritesmodels.Scratch) {
 	// testScene(sim)
 }
 
-func turtle(sim spritesmodels.Scratch, broker *spritestools.Broker[string]) {
+func turtle(sim spritesmodels.Sim, broker *spritestools.Broker[string]) {
 	broadcasts := broker.Subscribe()
 	s := sim.AddSprite(fmt.Sprintf("turtle%d%d", rand.Uint64(), rand.Uint64()))
 	s.Costume("t1")

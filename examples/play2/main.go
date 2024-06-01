@@ -15,7 +15,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Scratch) {
+func simStartFunc(sim spritesmodels.Sim) {
 	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t1")
 
 	a := 0.0
@@ -53,7 +53,7 @@ MainSpriteLoop:
 	sim.Exit()
 }
 
-func t2(sim spritesmodels.Scratch) {
+func t2(sim spritesmodels.Sim) {
 	s := sim.AddSprite("t2")
 	s.Costume("t1")
 	s.Scale(1)
@@ -81,7 +81,7 @@ func t2(sim spritesmodels.Scratch) {
 	}
 }
 
-func tClone(sim spritesmodels.Scratch, s spritesmodels.Sprite) {
+func tClone(sim spritesmodels.Sim, s spritesmodels.Sprite) {
 	justPressedChan := sim.SubscribeToJustPressedUserInput()
 	cb := s.GetClickBody()
 	// MainSpriteLoop:
