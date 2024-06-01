@@ -4,7 +4,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 )
 
 type circle struct {
@@ -26,7 +26,7 @@ type ClickOnBody struct {
 	radAngle float64
 }
 
-var _ models.ClickOnBody = &ClickOnBody{}
+var _ spritesmodels.ClickOnBody = &ClickOnBody{}
 
 func NewTouchCollisionBody() *ClickOnBody {
 	ret := &ClickOnBody{}
@@ -176,7 +176,7 @@ func overlapCircleRectangle(c *circle, r *rectangle) bool {
 }
 */
 
-func (s *ClickOnBody) Clone() models.ClickOnBody {
+func (s *ClickOnBody) Clone() spritesmodels.ClickOnBody {
 	ret := *s
 	copy(ret.circles, s.circles)
 	copy(ret.rectangles, s.rectangles)

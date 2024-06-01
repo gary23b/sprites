@@ -5,16 +5,16 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 )
 
 type gridBlock struct {
-	sprites map[int]models.NearMeInfo
+	sprites map[int]spritesmodels.NearMeInfo
 	mutex   sync.RWMutex
 }
 
 type brokerPosInfo struct {
-	state models.SpriteState
+	state spritesmodels.SpriteState
 	yGrid int
 	xGrid int
 	mutex sync.RWMutex
@@ -37,7 +37,7 @@ func NewPositionBroker() *PositionBroker {
 		ret.grid[y] = make([]gridBlock, 1000)
 		for x := range ret.grid[y] {
 			g := &ret.grid[y][x]
-			g.sprites = make(map[int]models.NearMeInfo)
+			g.sprites = make(map[int]spritesmodels.NearMeInfo)
 		}
 	}
 
@@ -63,7 +63,7 @@ func (s *PositionBroker) AddSprite(id int) {
 
 	g := &s.grid[y][x]
 	g.mutex.Lock()
-	g.sprites[id] = models.NearMeInfo{
+	g.sprites[id] = spritesmodels.NearMeInfo{
 		SpriteID:   id,
 		SpriteType: 0,
 		X:          float64(x-500) * 20,
@@ -88,7 +88,7 @@ func (s *PositionBroker) RemoveSprite(id int) {
 	delete(s.sprites, id)
 }
 
-func (s *PositionBroker) UpdateSpriteInfo(id int, state models.SpriteState) {
+func (s *PositionBroker) UpdateSpriteInfo(id int, state spritesmodels.SpriteState) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	item, ok := s.sprites[id]
@@ -114,7 +114,7 @@ func (s *PositionBroker) UpdateSpriteInfo(id int, state models.SpriteState) {
 
 	g := &s.grid[y][x]
 	g.mutex.Lock()
-	g.sprites[id] = models.NearMeInfo{
+	g.sprites[id] = spritesmodels.NearMeInfo{
 		SpriteID:   id,
 		SpriteType: state.SpriteType,
 		X:          state.X,
@@ -125,26 +125,26 @@ func (s *PositionBroker) UpdateSpriteInfo(id int, state models.SpriteState) {
 	item.state = state
 }
 
-func (s *PositionBroker) GetSpriteInfo(id int) models.SpriteState {
+func (s *PositionBroker) GetSpriteInfo(id int) spritesmodels.SpriteState {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	item, ok := s.sprites[id]
 	if !ok {
 		// log.Printf("id: %d was not found\n", id)
-		return models.SpriteState{Deleted: true}
+		return spritesmodels.SpriteState{Deleted: true}
 	}
 	item.mutex.Lock()
 	defer item.mutex.Unlock()
 	return item.state
 }
 
-func (s *PositionBroker) GetSpritesNearMe(x, y, distance float64) []models.NearMeInfo {
+func (s *PositionBroker) GetSpritesNearMe(x, y, distance float64) []spritesmodels.NearMeInfo {
 	xMin := max(0, min(999, int((x-distance)/20+500)))
 	yMin := max(0, min(999, int((y-distance)/20+500)))
 	xMax := max(0, min(999, int((x+distance)/20+500)))
 	yMax := max(0, min(999, int((y+distance)/20+500)))
 
-	ret := []models.NearMeInfo{}
+	ret := []spritesmodels.NearMeInfo{}
 
 	for y := yMin; y <= yMax; y++ {
 		for x := xMin; x <= xMax; x++ {

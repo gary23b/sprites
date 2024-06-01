@@ -9,8 +9,8 @@ import (
 	"sync"
 
 	"github.com/gary23b/sprites/game"
-	"github.com/gary23b/sprites/models"
 	"github.com/gary23b/sprites/sprite"
+	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 )
 
@@ -20,15 +20,15 @@ type scratchState struct {
 	g       *game.EbitenGame
 	cmdChan chan any
 
-	justPressedBroker *spritestools.Broker[*models.UserInput]
+	justPressedBroker *spritestools.Broker[*spritesmodels.UserInput]
 	posBroker         *spritestools.PositionBroker
 
 	idToSpriteMapMutex sync.RWMutex
-	idToSpriteMap      map[int]models.Sprite
-	nameToSpriteMap    map[string]models.Sprite
+	idToSpriteMap      map[int]spritesmodels.Sprite
+	nameToSpriteMap    map[string]spritesmodels.Sprite
 }
 
-var _ models.Scratch = &scratchState{} // Force the linter to tell us if the interface is implemented
+var _ spritesmodels.Scratch = &scratchState{} // Force the linter to tell us if the interface is implemented
 
 type ScratchParams struct {
 	Width   int  // Window Width in pixels
@@ -37,16 +37,16 @@ type ScratchParams struct {
 }
 
 // The drawFunc will be started as a go routine.
-func Start(params ScratchParams, simStartFunc func(models.Scratch)) {
+func Start(params ScratchParams, simStartFunc func(spritesmodels.Scratch)) {
 	log.SetFlags(log.Ltime | log.Lmicroseconds | log.Lshortfile)
 
 	ret := &scratchState{
 		width:             params.Width,
 		height:            params.Height,
-		justPressedBroker: spritestools.NewBroker[*models.UserInput](100),
+		justPressedBroker: spritestools.NewBroker[*spritesmodels.UserInput](100),
 		posBroker:         spritestools.NewPositionBroker(),
-		idToSpriteMap:     make(map[int]models.Sprite),
-		nameToSpriteMap:   make(map[string]models.Sprite),
+		idToSpriteMap:     make(map[int]spritesmodels.Sprite),
+		nameToSpriteMap:   make(map[string]spritesmodels.Sprite),
 	}
 
 	gameInit := game.GameInitStruct{
@@ -65,12 +65,12 @@ func (s *scratchState) Exit() {
 	s.g.TellGameToExit()
 }
 
-func (s *scratchState) AddSprite(uniqueName string) models.Sprite {
+func (s *scratchState) AddSprite(uniqueName string) spritesmodels.Sprite {
 	spriteID := s.g.GetNextSpriteID()
 	if uniqueName == "" {
 		uniqueName = fmt.Sprintf("rand%X%X", rand.Uint64(), rand.Uint64())
 	}
-	update := models.CmdAddNewSprite{
+	update := spritesmodels.CmdAddNewSprite{
 		SpriteID: spriteID,
 	}
 	s.cmdChan <- update
@@ -87,10 +87,10 @@ func (s *scratchState) AddSprite(uniqueName string) models.Sprite {
 	return ret
 }
 
-func (s *scratchState) DeleteSprite(in models.Sprite) {
+func (s *scratchState) DeleteSprite(in spritesmodels.Sprite) {
 	spriteID := in.GetSpriteID()
 	s.posBroker.RemoveSprite(spriteID)
-	update := models.CmdSpriteDelete{
+	update := spritesmodels.CmdSpriteDelete{
 		SpriteID: spriteID,
 	}
 	s.cmdChan <- update
@@ -102,20 +102,20 @@ func (s *scratchState) DeleteSprite(in models.Sprite) {
 }
 
 func (s *scratchState) DeleteAllSprites() {
-	update := models.CmdSpritesDeleteAll{}
+	update := spritesmodels.CmdSpritesDeleteAll{}
 	s.cmdChan <- update
 	s.posBroker = spritestools.NewPositionBroker()
 
 	s.idToSpriteMapMutex.Lock()
-	s.idToSpriteMap = make(map[int]models.Sprite)
-	s.nameToSpriteMap = make(map[string]models.Sprite)
+	s.idToSpriteMap = make(map[int]spritesmodels.Sprite)
+	s.nameToSpriteMap = make(map[string]spritesmodels.Sprite)
 	s.idToSpriteMapMutex.Unlock()
 }
 
-func (s *scratchState) SpriteUpdatePosAngle(in models.Sprite) {
+func (s *scratchState) SpriteUpdatePosAngle(in spritesmodels.Sprite) {
 	status := in.GetState()
 	s.posBroker.UpdateSpriteInfo(status.SpriteID, status)
-	cmd := models.CmdSpriteUpdateMin{
+	cmd := spritesmodels.CmdSpriteUpdateMin{
 		SpriteID: status.SpriteID,
 		X:        status.X,
 		Y:        status.Y,
@@ -125,10 +125,10 @@ func (s *scratchState) SpriteUpdatePosAngle(in models.Sprite) {
 	s.cmdChan <- cmd
 }
 
-func (s *scratchState) SpriteUpdateFull(in models.Sprite) {
+func (s *scratchState) SpriteUpdateFull(in spritesmodels.Sprite) {
 	status := in.GetState()
 	s.posBroker.UpdateSpriteInfo(status.SpriteID, status)
-	cmd := models.CmdSpriteUpdateFull{
+	cmd := spritesmodels.CmdSpriteUpdateFull{
 		SpriteID:    status.SpriteID,
 		CostumeName: status.CostumeName,
 		X:           status.X,
@@ -155,11 +155,11 @@ func (s *scratchState) GetSpriteID(uniqueName string) int {
 	return sprite.GetSpriteID()
 }
 
-func (s *scratchState) GetSpriteInfo(uniqueName string) models.SpriteState {
+func (s *scratchState) GetSpriteInfo(uniqueName string) spritesmodels.SpriteState {
 	return s.posBroker.GetSpriteInfo(s.GetSpriteID(uniqueName))
 }
 
-func (s *scratchState) GetSpriteInfoByID(id int) models.SpriteState {
+func (s *scratchState) GetSpriteInfoByID(id int) spritesmodels.SpriteState {
 	return s.posBroker.GetSpriteInfo(id)
 }
 
@@ -171,21 +171,21 @@ func (s *scratchState) GetHeight() int {
 	return s.height
 }
 
-func (s *scratchState) PressedUserInput() *models.UserInput {
+func (s *scratchState) PressedUserInput() *spritesmodels.UserInput {
 	ret := s.g.PressedUserInput()
 	return ret
 }
 
-func (s *scratchState) SubscribeToJustPressedUserInput() chan *models.UserInput {
+func (s *scratchState) SubscribeToJustPressedUserInput() chan *spritesmodels.UserInput {
 	return s.justPressedBroker.Subscribe()
 }
 
-func (s *scratchState) UnSubscribeToJustPressedUserInput(in chan *models.UserInput) {
+func (s *scratchState) UnSubscribeToJustPressedUserInput(in chan *spritesmodels.UserInput) {
 	s.justPressedBroker.Unsubscribe(in)
 }
 
 func (sim *scratchState) AddCostume(img image.Image, name string) {
-	update := models.CmdAddCostume{
+	update := spritesmodels.CmdAddCostume{
 		Img:         img,
 		CostumeName: name,
 	}
@@ -193,7 +193,7 @@ func (sim *scratchState) AddCostume(img image.Image, name string) {
 }
 
 func (sim *scratchState) AddSound(path, name string) {
-	cmd := models.CmdAddSound{
+	cmd := spritesmodels.CmdAddSound{
 		Path:      path,
 		SoundName: name,
 	}
@@ -201,14 +201,14 @@ func (sim *scratchState) AddSound(path, name string) {
 }
 
 func (sim *scratchState) PlaySound(name string, volume float64) {
-	cmd := models.CmdPlaySound{
+	cmd := spritesmodels.CmdPlaySound{
 		SoundName: name,
 		Volume:    volume,
 	}
 	sim.cmdChan <- cmd
 }
 
-func (sim *scratchState) WhoIsNearMe(x, y, distance float64) []models.NearMeInfo {
+func (sim *scratchState) WhoIsNearMe(x, y, distance float64) []spritesmodels.NearMeInfo {
 	return sim.posBroker.GetSpritesNearMe(x, y, distance)
 }
 
@@ -227,7 +227,7 @@ func (sim *scratchState) SendMsg(toSpriteID int, msg any) {
 func (sim *scratchState) GetScreenshot() image.Image {
 	screenshotChan := make(chan image.Image)
 
-	cmd := models.CmdGetScreenshot{
+	cmd := spritesmodels.CmdGetScreenshot{
 		ImageChan: screenshotChan,
 	}
 	sim.cmdChan <- cmd
@@ -240,8 +240,8 @@ func (sim *scratchState) GetScreenshot() image.Image {
 // This returns nil if there is no new data.
 // This will throw away all but the newest set of data available. So this should be called faster that the game update rate (60Hz),
 // otherwise sim.PressedUserInput() should be used instead.
-func GetNewestJustPressedFromChan(justPressedChan chan *models.UserInput) *models.UserInput {
-	var ret *models.UserInput
+func GetNewestJustPressedFromChan(justPressedChan chan *spritesmodels.UserInput) *spritesmodels.UserInput {
+	var ret *spritesmodels.UserInput
 
 ChanExtractionLoop:
 	for {

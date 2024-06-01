@@ -5,7 +5,7 @@ package mocks
 import (
 	image "image"
 
-	models "github.com/gary23b/sprites/models"
+	models "github.com/gary23b/sprites/spritesmodels"
 	mock "github.com/stretchr/testify/mock"
 )
 

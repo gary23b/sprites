@@ -10,7 +10,7 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 	"github.com/jakecoffman/cp"
 )
@@ -22,7 +22,7 @@ func main() {
 }
 
 type object struct {
-	sprite models.Sprite
+	sprite spritesmodels.Sprite
 	body   *cp.Body
 }
 
@@ -34,7 +34,7 @@ A shape can be made out of segments, a circle, or a rectangle.
 A segment seems to be a wide line with rounded ends.
 */
 
-func simStartFunc(sim models.Scratch) {
+func simStartFunc(sim spritesmodels.Scratch) {
 	oList := []*object{}
 
 	space := cp.NewSpace()
@@ -80,7 +80,7 @@ func simStartFunc(sim models.Scratch) {
 	}
 }
 
-func AddContainer(sim models.Scratch, space *cp.Space) *object {
+func AddContainer(sim spritesmodels.Scratch, space *cp.Space) *object {
 	container := space.AddBody(cp.NewKinematicBody())
 	container.SetAngularVelocity(0.4)
 	container.SetPosition(cp.Vector{X: 0, Y: 0})
@@ -119,7 +119,7 @@ func AddContainer(sim models.Scratch, space *cp.Space) *object {
 	return ret
 }
 
-func NewBox(sim models.Scratch, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
+func NewBox(sim spritesmodels.Scratch, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
 	body := cp.NewBody(mass, cp.MomentForBox(mass, width, height))
 	_ = space.AddBody(body)
 	body.SetPosition(pos)
@@ -144,7 +144,7 @@ func NewBox(sim models.Scratch, space *cp.Space, pos cp.Vector, mass, width, hei
 	return ret
 }
 
-func NewCircle(sim models.Scratch, space *cp.Space, pos cp.Vector, mass, radius float64) *object {
+func NewCircle(sim spritesmodels.Scratch, space *cp.Space, pos cp.Vector, mass, radius float64) *object {
 	body := cp.NewBody(mass, cp.MomentForCircle(mass, 0, radius, cp.Vector{}))
 	_ = space.AddBody(body)
 	body.SetPosition(pos)
@@ -169,7 +169,7 @@ func NewCircle(sim models.Scratch, space *cp.Space, pos cp.Vector, mass, radius 
 	return ret
 }
 
-func AddSegment(sim models.Scratch, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
+func AddSegment(sim spritesmodels.Scratch, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
 	body := cp.NewBody(mass, cp.MomentForBox(mass, width, height))
 	_ = space.AddBody(body)
 	body.SetPosition(pos)

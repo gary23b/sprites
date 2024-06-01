@@ -1,4 +1,4 @@
-package models
+package spritesmodels
 
 type KeysStruct struct {
 	LeftArrow  bool

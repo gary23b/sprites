@@ -11,16 +11,16 @@ import (
 	"time"
 
 	"github.com/gary23b/easygif"
-	"github.com/gary23b/sprites/models"
+	"github.com/gary23b/sprites/spritesmodels"
 )
 
-func TakeScreenshot(sim models.Scratch, outputPNGPath string) error {
+func TakeScreenshot(sim spritesmodels.Scratch, outputPNGPath string) error {
 	screenshot := sim.GetScreenshot()
 	return easygif.SaveImageToPNG(screenshot, outputPNGPath)
 }
 
 func TakeScreenshotVideo(
-	sim models.Scratch,
+	sim spritesmodels.Scratch,
 	delayBetweenScreenshots time.Duration,
 	frameCount int,
 ) []image.Image {
@@ -40,7 +40,7 @@ func TakeScreenshotVideo(
 
 // Start this as a go routine to create a GIF of your creation.
 func CreateGif(
-	sim models.Scratch,
+	sim spritesmodels.Scratch,
 	delayBetweenScreenshots time.Duration,
 	delayBetweenGifFrames time.Duration,
 	outputGifFilePath string,
@@ -61,7 +61,7 @@ func CreateGif(
 
 // Start this as a go routine to create a GIF of your creation.
 func CreateGifDithered(
-	sim models.Scratch,
+	sim spritesmodels.Scratch,
 	delayBetweenScreenshots time.Duration,
 	delayBetweenGifFrames time.Duration,
 	outputGifFilePath string,
