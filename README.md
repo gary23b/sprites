@@ -44,24 +44,23 @@ import (
 	"time"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/models"
-	"github.com/gary23b/sprites/sprite"
 )
 
 func main() {
-	params := sprites.ScratchParams{Width: 500, Height: 500}
+	params := sprites.SimParams{Width: 500, Height: 500}
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim models.Scratch) {
-	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t")
+func simStartFunc(sim sprites.Sim) {
+	sim.AddCostume(sprites.DecodeCodedSprite(sprites.TurtleImage), "t")
+
 	for {
 		go turtleRandomWalk(sim)
 		time.Sleep(time.Millisecond * 500)
 	}
 }
 
-func turtleRandomWalk(sim models.Scratch) {
+func turtleRandomWalk(sim sprites.Sim) {
 	s := sim.AddSprite("")
 	s.Costume("t")
 	s.Visible(true)
@@ -108,7 +107,7 @@ go run github.com/gary23b/sprites/examples/fallingturtles@latest
 
 ### Tumbler
 
-Here is a simulation of a rotating box filled with circles, boxes, and rounded rectangles. This uses the library github.com/jakecoffman/cp for the physics simulation. The sprites are being drawn using Golang Scratch.
+Here is a simulation of a rotating box filled with circles, boxes, and rounded rectangles. This uses the library github.com/jakecoffman/cp for the physics simulation. The sprites are being drawn using Golang Sprites.
 
 This is a recreation of <https://jakecoffman.com/cp-ebiten/tumble/> except without drawing the shapes using ebiten and cp directly. Here, cp is only performing the physics updates. The original code can be found [here](https://github.com/jakecoffman/cp-examples/blob/master/tumble/tumble.go)
 

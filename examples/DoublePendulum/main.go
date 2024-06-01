@@ -13,7 +13,7 @@ import (
 // https://stackoverflow.com/questions/68339204/double-pendulum-rk4
 // https://stackoverflow.com/questions/65224923/i-want-to-have-the-pendulum-blob-in-my-double-pendulum
 func main() {
-	params := sprites.ScratchParams{Width: 1000, Height: 1000, ShowFPS: true}
+	params := sprites.SimParams{Width: 1000, Height: 1000, ShowFPS: true}
 	sprites.Start(params, simStartFunc)
 }
 

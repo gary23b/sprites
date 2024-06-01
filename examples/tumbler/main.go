@@ -15,7 +15,7 @@ import (
 
 // https://github.com/jakecoffman/cp-ebiten/tree/gh-pages
 func main() {
-	params := sprites.ScratchParams{Width: 600, Height: 600, ShowFPS: true}
+	params := sprites.SimParams{Width: 600, Height: 600, ShowFPS: true}
 	sprites.Start(params, simStartFunc)
 }
 
@@ -63,7 +63,7 @@ func simStartFunc(sim sprites.Sim) {
 		}
 	}
 
-	// go scratch.CreateGif(sim, time.Millisecond*100, time.Millisecond*100, "./examples/tumbler/tumbler.gif", 100)
+	// go sprites.CreateGif(sim, time.Millisecond*100, time.Millisecond*100, "./examples/tumbler/tumbler.gif", 100)
 
 	// Run the processing loop forever.
 	for {
