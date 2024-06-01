@@ -5,12 +5,13 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/gary23b/sprites"
 	"github.com/gary23b/sprites/spritesmodels"
 )
 
 type bunny struct {
-	sim    spritesmodels.Sim
-	sprite spritesmodels.Sprite
+	sim    sprites.Sim
+	sprite sprites.Sprite
 	food   *spritesmodels.NearMeInfo
 	x, y   float64
 	health float64
@@ -20,7 +21,7 @@ type bunny struct {
 	spawnCounter int
 }
 
-func Main_Bunny(sim spritesmodels.Sim, x, y float64) {
+func Main_Bunny(sim sprites.Sim, x, y float64) {
 
 	s := sim.AddSprite("")
 	s.Costume("Bunny")

@@ -1,4 +1,4 @@
-package sprite
+package sprites
 
 import (
 	"bytes"
@@ -11,6 +11,44 @@ import (
 	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 )
+
+type Sprite interface {
+	GetSpriteID() int
+	GetUniqueName() string
+	Clone(UniqueName string) Sprite
+
+	// Updates
+	Costume(name string)
+	SetType(newType int)
+	Angle(angleDegrees float64)
+	Pos(cartX, cartY float64) // Cartesian (x,y). Center in the middle of the window
+	Z(int)                    //
+	Visible(visible bool)
+	Scale(scale float64) // Sets xScale and yScale together
+	XYScale(xScale, yScale float64)
+	Opacity(opacityPercent float64) // 0 is completely transparent and 100 is completely opaque
+	All(in spritesmodels.SpriteState)
+
+	// Info
+	GetState() spritesmodels.SpriteState
+
+	// Click Body
+	GetClickBody() spritesmodels.ClickOnBody
+	ReplaceClickBody(in spritesmodels.ClickOnBody)
+
+	// User Input
+	PressedUserInput() *spritesmodels.UserInput
+	JustPressedUserInput() *spritesmodels.UserInput
+
+	// Interact With other sprites
+	WhoIsNearMe(distance float64) []spritesmodels.NearMeInfo
+	SendMsg(toSpriteID int, msg any)
+	GetMsgs() []any
+	AddMsg(msg any)
+
+	// exit
+	DeleteSprite()
+}
 
 func LoadSpriteFile(path string) (image.Image, error) {
 	spriteFileData, err := os.ReadFile(path)
@@ -25,7 +63,7 @@ func LoadSpriteFile(path string) (image.Image, error) {
 }
 
 type sprite struct {
-	sim spritesmodels.Sim
+	sim Sim
 
 	spriteID    int
 	spriteType  int
@@ -46,9 +84,9 @@ type sprite struct {
 	receivedMsgs  chan any
 }
 
-var _ spritesmodels.Sprite = &sprite{}
+var _ Sprite = &sprite{}
 
-func NewSprite(sim spritesmodels.Sim, uniqueName string, spriteID int) *sprite {
+func NewSprite(sim Sim, uniqueName string, spriteID int) *sprite {
 	ret := &sprite{
 		spriteID:     spriteID,
 		UniqueName:   uniqueName,
@@ -62,7 +100,7 @@ func NewSprite(sim spritesmodels.Sim, uniqueName string, spriteID int) *sprite {
 	return ret
 }
 
-func (s *sprite) Clone(uniqueName string) spritesmodels.Sprite {
+func (s *sprite) Clone(uniqueName string) Sprite {
 	sClone := s.sim.AddSprite(uniqueName)
 	sClone.All(s.GetState())
 	if s.clickBody != nil {

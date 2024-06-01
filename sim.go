@@ -9,10 +9,40 @@ import (
 	"sync"
 
 	"github.com/gary23b/sprites/game"
-	"github.com/gary23b/sprites/sprite"
 	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 )
+
+type Sim interface {
+	GetWidth() int
+	GetHeight() int
+
+	AddCostume(img image.Image, name string)
+	AddSprite(UniqueName string) Sprite // If no name is given, a random name is generated.
+	DeleteSprite(Sprite)
+	DeleteAllSprites()
+
+	SpriteUpdatePosAngle(in Sprite)
+	SpriteUpdateFull(in Sprite)
+
+	AddSound(path, name string)
+	PlaySound(name string, volume float64) // volume must be between 0 and 1.
+
+	PressedUserInput() *spritesmodels.UserInput
+	SubscribeToJustPressedUserInput() chan *spritesmodels.UserInput
+	UnSubscribeToJustPressedUserInput(in chan *spritesmodels.UserInput)
+
+	GetSpriteID(UniqueName string) int
+	GetSpriteInfo(UniqueName string) spritesmodels.SpriteState
+	GetSpriteInfoByID(id int) spritesmodels.SpriteState
+
+	WhoIsNearMe(x, y, distance float64) []spritesmodels.NearMeInfo
+	SendMsg(toSpriteID int, msg any)
+
+	GetScreenshot() image.Image
+
+	Exit()
+}
 
 type scratchState struct {
 	width   int
@@ -24,11 +54,11 @@ type scratchState struct {
 	posBroker         *spritestools.PositionBroker
 
 	idToSpriteMapMutex sync.RWMutex
-	idToSpriteMap      map[int]spritesmodels.Sprite
-	nameToSpriteMap    map[string]spritesmodels.Sprite
+	idToSpriteMap      map[int]Sprite
+	nameToSpriteMap    map[string]Sprite
 }
 
-var _ spritesmodels.Sim = &scratchState{} // Force the linter to tell us if the interface is implemented
+var _ Sim = &scratchState{} // Force the linter to tell us if the interface is implemented
 
 type ScratchParams struct {
 	Width   int  // Window Width in pixels
@@ -37,7 +67,7 @@ type ScratchParams struct {
 }
 
 // The drawFunc will be started as a go routine.
-func Start(params ScratchParams, simStartFunc func(spritesmodels.Sim)) {
+func Start(params ScratchParams, simStartFunc func(Sim)) {
 	log.SetFlags(log.Ltime | log.Lmicroseconds | log.Lshortfile)
 
 	ret := &scratchState{
@@ -45,8 +75,8 @@ func Start(params ScratchParams, simStartFunc func(spritesmodels.Sim)) {
 		height:            params.Height,
 		justPressedBroker: spritestools.NewBroker[*spritesmodels.UserInput](100),
 		posBroker:         spritestools.NewPositionBroker(),
-		idToSpriteMap:     make(map[int]spritesmodels.Sprite),
-		nameToSpriteMap:   make(map[string]spritesmodels.Sprite),
+		idToSpriteMap:     make(map[int]Sprite),
+		nameToSpriteMap:   make(map[string]Sprite),
 	}
 
 	gameInit := game.GameInitStruct{
@@ -65,7 +95,7 @@ func (s *scratchState) Exit() {
 	s.g.TellGameToExit()
 }
 
-func (s *scratchState) AddSprite(uniqueName string) spritesmodels.Sprite {
+func (s *scratchState) AddSprite(uniqueName string) Sprite {
 	spriteID := s.g.GetNextSpriteID()
 	if uniqueName == "" {
 		uniqueName = fmt.Sprintf("rand%X%X", rand.Uint64(), rand.Uint64())
@@ -76,7 +106,7 @@ func (s *scratchState) AddSprite(uniqueName string) spritesmodels.Sprite {
 	s.cmdChan <- update
 
 	s.posBroker.AddSprite(spriteID)
-	ret := sprite.NewSprite(s, uniqueName, spriteID)
+	ret := NewSprite(s, uniqueName, spriteID)
 
 	s.idToSpriteMapMutex.Lock()
 	s.idToSpriteMap[spriteID] = ret
@@ -87,7 +117,7 @@ func (s *scratchState) AddSprite(uniqueName string) spritesmodels.Sprite {
 	return ret
 }
 
-func (s *scratchState) DeleteSprite(in spritesmodels.Sprite) {
+func (s *scratchState) DeleteSprite(in Sprite) {
 	spriteID := in.GetSpriteID()
 	s.posBroker.RemoveSprite(spriteID)
 	update := spritesmodels.CmdSpriteDelete{
@@ -107,12 +137,12 @@ func (s *scratchState) DeleteAllSprites() {
 	s.posBroker = spritestools.NewPositionBroker()
 
 	s.idToSpriteMapMutex.Lock()
-	s.idToSpriteMap = make(map[int]spritesmodels.Sprite)
-	s.nameToSpriteMap = make(map[string]spritesmodels.Sprite)
+	s.idToSpriteMap = make(map[int]Sprite)
+	s.nameToSpriteMap = make(map[string]Sprite)
 	s.idToSpriteMapMutex.Unlock()
 }
 
-func (s *scratchState) SpriteUpdatePosAngle(in spritesmodels.Sprite) {
+func (s *scratchState) SpriteUpdatePosAngle(in Sprite) {
 	status := in.GetState()
 	s.posBroker.UpdateSpriteInfo(status.SpriteID, status)
 	cmd := spritesmodels.CmdSpriteUpdateMin{
@@ -125,7 +155,7 @@ func (s *scratchState) SpriteUpdatePosAngle(in spritesmodels.Sprite) {
 	s.cmdChan <- cmd
 }
 
-func (s *scratchState) SpriteUpdateFull(in spritesmodels.Sprite) {
+func (s *scratchState) SpriteUpdateFull(in Sprite) {
 	status := in.GetState()
 	s.posBroker.UpdateSpriteInfo(status.SpriteID, status)
 	cmd := spritesmodels.CmdSpriteUpdateFull{

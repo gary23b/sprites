@@ -5,8 +5,6 @@ import (
 	"image/color"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/sprite"
-	"github.com/gary23b/sprites/spritesmodels"
 )
 
 var (
@@ -26,7 +24,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Sim) {
+func simStartFunc(sim sprites.Sim) {
 	// Set the background by making a single pixel image and scaling it be be the entire screen.
 	img := image.NewRGBA(image.Rect(0, 0, 1, 1))
 	img.Set(0, 0, SandyBrown)
@@ -40,7 +38,7 @@ func simStartFunc(sim spritesmodels.Sim) {
 	img = image.NewRGBA(image.Rect(0, 0, 1, 1))
 	img.Set(0, 0, LawnGreen)
 	sim.AddCostume(img, "Grass")
-	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "Bunny")
+	sim.AddCostume(sprites.DecodeCodedSprite(sprites.TurtleImage), "Bunny")
 
 	for y := -300; y < 300; y += 10 {
 		for x := -300; x < 300; x += 10 {

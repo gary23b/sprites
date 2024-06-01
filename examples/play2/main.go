@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/sprite"
-	"github.com/gary23b/sprites/spritesmodels"
 )
 
 func main() {
@@ -15,8 +13,8 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Sim) {
-	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t1")
+func simStartFunc(sim sprites.Sim) {
+	sim.AddCostume(sprites.DecodeCodedSprite(sprites.TurtleImage), "t1")
 
 	a := 0.0
 	s := sim.AddSprite("mainTurtle")
@@ -53,7 +51,7 @@ MainSpriteLoop:
 	sim.Exit()
 }
 
-func t2(sim spritesmodels.Sim) {
+func t2(sim sprites.Sim) {
 	s := sim.AddSprite("t2")
 	s.Costume("t1")
 	s.Scale(1)
@@ -81,7 +79,7 @@ func t2(sim spritesmodels.Sim) {
 	}
 }
 
-func tClone(sim spritesmodels.Sim, s spritesmodels.Sprite) {
+func tClone(sim sprites.Sim, s sprites.Sprite) {
 	justPressedChan := sim.SubscribeToJustPressedUserInput()
 	cb := s.GetClickBody()
 	// MainSpriteLoop:

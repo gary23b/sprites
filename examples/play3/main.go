@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/spritesmodels"
 	"github.com/gary23b/sprites/spritestools"
 )
 
@@ -14,7 +13,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Sim) {
+func simStartFunc(sim sprites.Sim) {
 	// sim.AddCostume(ebitensim.DecodeCodedSprite(ebitensim.TurtleImage), "t1")
 
 	textImage := spritestools.CreateTextBubble(200, 100, "abasd sdf sdfsdfsd fs dfsdfsd fsdf sf\n    c234", 20)
