@@ -6,7 +6,7 @@ import (
 	"math"
 
 	"github.com/fogleman/gg"
-	"github.com/gary23b/sprites/spritestools"
+	"github.com/gary23b/sprites"
 )
 
 func createCircleImage(radius float64, c color.Color) image.Image {
@@ -14,7 +14,7 @@ func createCircleImage(radius float64, c color.Color) image.Image {
 	dc.DrawCircle(radius*1.5, radius*1.5, radius)
 	dc.SetColor(c)
 	dc.Fill()
-	dc.SetColor(spritestools.White)
+	dc.SetColor(sprites.White)
 	dc.SetLineWidth(3)
 	dc.DrawLine(radius*1.5, radius*1.5, radius*2.0, radius*1.5)
 	dc.Stroke()

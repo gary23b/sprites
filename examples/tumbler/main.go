@@ -10,8 +10,6 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/spritesmodels"
-	"github.com/gary23b/sprites/spritestools"
 	"github.com/jakecoffman/cp"
 )
 
@@ -22,7 +20,7 @@ func main() {
 }
 
 type object struct {
-	sprite spritesmodels.Sprite
+	sprite sprites.Sprite
 	body   *cp.Body
 }
 
@@ -34,7 +32,7 @@ A shape can be made out of segments, a circle, or a rectangle.
 A segment seems to be a wide line with rounded ends.
 */
 
-func simStartFunc(sim spritesmodels.Sim) {
+func simStartFunc(sim sprites.Sim) {
 	oList := []*object{}
 
 	space := cp.NewSpace()
@@ -80,7 +78,7 @@ func simStartFunc(sim spritesmodels.Sim) {
 	}
 }
 
-func AddContainer(sim spritesmodels.Sim, space *cp.Space) *object {
+func AddContainer(sim sprites.Sim, space *cp.Space) *object {
 	container := space.AddBody(cp.NewKinematicBody())
 	container.SetAngularVelocity(0.4)
 	container.SetPosition(cp.Vector{X: 0, Y: 0})
@@ -104,7 +102,7 @@ func AddContainer(sim spritesmodels.Sim, space *cp.Space) *object {
 
 	dc := gg.NewContext(400, 400)
 	dc.DrawRectangle(0, 0, 400, 400)
-	dc.SetColor(spritestools.Aqua)
+	dc.SetColor(sprites.Aqua)
 	dc.Stroke()
 	sim.AddCostume(dc.Image(), "container")
 	sprite := sim.AddSprite("container")
@@ -119,7 +117,7 @@ func AddContainer(sim spritesmodels.Sim, space *cp.Space) *object {
 	return ret
 }
 
-func NewBox(sim spritesmodels.Sim, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
+func NewBox(sim sprites.Sim, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
 	body := cp.NewBody(mass, cp.MomentForBox(mass, width, height))
 	_ = space.AddBody(body)
 	body.SetPosition(pos)
@@ -144,7 +142,7 @@ func NewBox(sim spritesmodels.Sim, space *cp.Space, pos cp.Vector, mass, width, 
 	return ret
 }
 
-func NewCircle(sim spritesmodels.Sim, space *cp.Space, pos cp.Vector, mass, radius float64) *object {
+func NewCircle(sim sprites.Sim, space *cp.Space, pos cp.Vector, mass, radius float64) *object {
 	body := cp.NewBody(mass, cp.MomentForCircle(mass, 0, radius, cp.Vector{}))
 	_ = space.AddBody(body)
 	body.SetPosition(pos)
@@ -169,7 +167,7 @@ func NewCircle(sim spritesmodels.Sim, space *cp.Space, pos cp.Vector, mass, radi
 	return ret
 }
 
-func AddSegment(sim spritesmodels.Sim, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
+func AddSegment(sim sprites.Sim, space *cp.Space, pos cp.Vector, mass, width, height float64) *object {
 	body := cp.NewBody(mass, cp.MomentForBox(mass, width, height))
 	_ = space.AddBody(body)
 	body.SetPosition(pos)
@@ -200,7 +198,7 @@ func createCircleImage(radius float64, c color.Color) image.Image {
 	dc.DrawCircle(radius*1.5, radius*1.5, radius)
 	dc.SetColor(c)
 	dc.Fill()
-	dc.SetColor(spritestools.White)
+	dc.SetColor(sprites.White)
 	dc.SetLineWidth(3)
 	dc.DrawLine(radius*1.5, radius*1.5, radius*2.0, radius*1.5)
 	dc.Stroke()

@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/sprite"
-	"github.com/gary23b/sprites/spritesmodels"
 )
 
 func main() {
@@ -15,8 +13,8 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Sim) {
-	sim.AddCostume(sprite.DecodeCodedSprite(sprite.TurtleImage), "t")
+func simStartFunc(sim sprites.Sim) {
+	sim.AddCostume(sprites.DecodeCodedSprite(sprites.TurtleImage), "t")
 
 	// go scratch.CreateGifDithered(sim, time.Millisecond*100, time.Millisecond*100, "./examples/randomwalk/randomwalk.gif", 100)
 
@@ -26,7 +24,7 @@ func simStartFunc(sim spritesmodels.Sim) {
 	}
 }
 
-func turtleRandomWalk(sim spritesmodels.Sim) {
+func turtleRandomWalk(sim sprites.Sim) {
 	s := sim.AddSprite("")
 	s.Costume("t")
 	s.Visible(true)

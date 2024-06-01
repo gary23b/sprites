@@ -70,6 +70,11 @@ func TestLerpUint8(t *testing.T) {
 }
 
 func TestLerpColor(t *testing.T) {
+	var (
+		Black color.RGBA = color.RGBA{0x00, 0x00, 0x00, 0xFF} // #000000
+		White color.RGBA = color.RGBA{0xFF, 0xFF, 0xFF, 0xFF} // #FFFFFF
+	)
+
 	type args struct {
 		a     color.RGBA
 		b     color.RGBA

@@ -34,6 +34,12 @@ func DrawRoundedRectangleThoughtBubble(dc *gg.Context, x, y, w, h, r float64) {
 }
 
 func CreateTextBubble(width, height float64, inputText string, size float64) image.Image {
+	var (
+		Black   color.RGBA = color.RGBA{0x00, 0x00, 0x00, 0xFF} // #000000
+		White   color.RGBA = color.RGBA{0xFF, 0xFF, 0xFF, 0xFF} // #FFFFFF
+		SkyBlue color.RGBA = color.RGBA{0x87, 0xCE, 0xEB, 0xFF} // #87CEEB
+	)
+
 	// startTime := time.Now()
 	font, err := truetype.Parse(goregular.TTF)
 	if err != nil {

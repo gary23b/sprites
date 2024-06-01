@@ -8,8 +8,6 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/gary23b/sprites"
-	"github.com/gary23b/sprites/spritesmodels"
-	"github.com/gary23b/sprites/spritestools"
 )
 
 // https://stackoverflow.com/questions/68339204/double-pendulum-rk4
@@ -19,7 +17,7 @@ func main() {
 	sprites.Start(params, simStartFunc)
 }
 
-func simStartFunc(sim spritesmodels.Sim) {
+func simStartFunc(sim sprites.Sim) {
 	// Starting conditions
 	theta1 := (math.Pi / 180.0) * 180.1
 	theta2 := (math.Pi / 180.0) * 180.0
@@ -27,11 +25,11 @@ func simStartFunc(sim spritesmodels.Sim) {
 	w2 := 0.0
 	scaleUpBy := 200.0
 
-	sim.AddCostume(createCircle(20, spritestools.White), "White Circle")
-	sim.AddCostume(createCircle(18, spritestools.Green), "Green Circle")
-	sim.AddCostume(createCircle(16, spritestools.Red), "Red Circle")
-	sim.AddCostume(createRectangle(16, scaleUpBy, spritestools.SkyBlue), "connecting bar 1")
-	sim.AddCostume(createRectangle(12, scaleUpBy, spritestools.Yellow), "connecting bar 2")
+	sim.AddCostume(createCircle(20, sprites.White), "White Circle")
+	sim.AddCostume(createCircle(18, sprites.Green), "Green Circle")
+	sim.AddCostume(createCircle(16, sprites.Red), "Red Circle")
+	sim.AddCostume(createRectangle(16, scaleUpBy, sprites.SkyBlue), "connecting bar 1")
+	sim.AddCostume(createRectangle(12, scaleUpBy, sprites.Yellow), "connecting bar 2")
 
 	pivot := sim.AddSprite("pivot")
 	pivot.Costume("White Circle")
