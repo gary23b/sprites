@@ -1,0 +1,9 @@
+outpkg: mocks
+mockname: "{{.InterfaceName}}"
+filename: "{{.InterfaceName}}.go"
+
+packages:
+  github.com/gary23b/sprites/models:
+    config:
+      dir: "models/mocks"
+      all: true

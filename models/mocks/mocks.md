@@ -1,15 +1,18 @@
-# Mockery Mocks
+# Mockery
 
-[Mockery examples](https://vektra.github.io/mockery/latest/examples/)
+## Install
 
-## Install Mockery
+- <https://github.com/vektra/mockery.com>
+- <https://vektra.github.io/mockery/latest/installation/>
 
 ```bash
-go install github.com/vektra/mockery/v2@v2.32.0
+go install github.com/vektra/mockery/v2@v2.46.3
 ```
 
-## Build for models directory
+## Build mocks for models directory
+
+change directories to the backend folder in your terminal.
 
 ```bash
-mockery --all --dir="./models" --output="./models/mocks"
+mockery
 ```

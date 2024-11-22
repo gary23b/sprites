@@ -1,6 +1,6 @@
 # Options for analysis running.
 run:
-  go: '1.22'
+  go: '1.23'
 
 linters:
   fast: true
@@ -12,7 +12,6 @@ linters:
     - govet
     - ineffassign
     - staticcheck
-    - typecheck
     - unused
 
     # Extras
@@ -21,9 +20,11 @@ linters:
     - durationcheck
     - errorlint
     - exhaustive
-    - exportloopref
+    - copyloopvar
     - forbidigo
     - forcetypeassert
+    # - gochecknoglobals
+    - gochecknoinits
     - gocritic
     - gofumpt
     - goimports
@@ -33,15 +34,16 @@ linters:
     - nakedret
     - nilerr
     - nolintlint
-    # - prealloc
+    - prealloc
     - predeclared
-    # - rowserrcheck # "is disabled because of generics"
-    # - sqlclosecheck # "is disabled because of generics"
+    - rowserrcheck
+    - sqlclosecheck
+    - tagalign
     - thelper
     - tparallel
     - unconvert
     - unparam
-    # - wastedassign # "is disabled because of generics"
+    - wastedassign
     - whitespace
 
 issues:
@@ -63,4 +65,4 @@ linters-settings:
     # Default: ""
     # Choose whether or not to use the extra rules that are disabled
     # by default
-    extra-rules: false
+    extra-rules: true
