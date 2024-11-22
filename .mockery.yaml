@@ -3,7 +3,7 @@ mockname: "{{.InterfaceName}}"
 filename: "{{.InterfaceName}}.go"
 
 packages:
-  github.com/gary23b/sprites/models:
+  github.com/gary23b/sprites/spritesmodels:
     config:
-      dir: "models/mocks"
+      dir: "spritesmodels/mocks"
       all: true
